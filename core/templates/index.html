@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | AlumniTrack{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Visão Geral</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Total de Egressos</small>
+                <h3 class="fw-bold">1.248</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Taxa de Resposta</small>
+                <h3 class="fw-bold text-success">68%</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Empregabilidade</small>
+                <h3 class="fw-bold text-primary">82%</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Formulários Ativos</small>
+                <h3 class="fw-bold">3</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="mb-3">Taxa de Resposta Recente</h5>
+        <div class="progress mb-2">
+            <div class="progress-bar" style="width: 68%"></div>
+        </div>
+        <small class="text-muted">Últimos 7 dias</small>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Egressos | AlumniTrack{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Gerenciamento de Egressos</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between mb-3">
+            <input 
+                type="text" 
+                class="form-control w-50" 
+                placeholder="Buscar por nome ou curso"
+                onkeyup="filtrarEgressos(this.value)"
+            >
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-success">
+                    Enviar WhatsApp
+                </button>
+                <button class="btn btn-outline-primary">
+                    Enviar E-mail
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Curso</th>
+                        <th>Status</th>
+                        <th>Contato</th>
+                        <th class="text-center">Respondido</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-egressos">
+                    <tr>
+                        <td>Ana Silva</td>
+                        <td>
+                            Engenharia de Software<br>
+                            <small class="text-muted">2022</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-success">Empregado</span>
+                        </td>
+                        <td>
+                            ana.silva@email.com<br>
+                            <small class="text-muted">+55 11 99999-9999</small>
+                        </td>
+                        <td class="text-center">✔</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
