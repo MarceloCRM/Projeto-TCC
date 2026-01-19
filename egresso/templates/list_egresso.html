@@ -31,29 +31,41 @@
                 <thead class="table-light">
                     <tr>
                         <th>Nome</th>
-                        <th>Curso</th>
+                        <th>Data de Nascimento</th>
+                        <th>Gênero</th>
                         <th>Status</th>
                         <th>Contato</th>
-                        <th class="text-center">Respondido</th>
                     </tr>
                 </thead>
                 <tbody id="tabela-egressos">
-                    <tr>
-                        <td>Ana Silva</td>
-                        <td>
-                            Engenharia de Software<br>
-                            <small class="text-muted">2022</small>
-                        </td>
-                        <td>
-                            <span class="badge bg-success">Empregado</span>
-                        </td>
-                        <td>
-                            ana.silva@email.com<br>
-                            <small class="text-muted">+55 11 99999-9999</small>
-                        </td>
-                        <td class="text-center">✔</td>
-                    </tr>
-                </tbody>
+                    {% for egresso in egresso %}
+                        <tr>
+                            <td>{{ egresso.fullName }}</td>
+                            <td>{{ egresso.birthDate }}</td>
+                            <td>{{ egresso.gender }}</td>
+                            <td>
+                                {% if egresso.status == 'Desempregado' %}
+                                    <span class="badge bg-danger">{{ egresso.status }}</span>
+                                {% elif egresso.status == 'Empregado' %}
+                                    <span class="badge bg-success">{{ egresso.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ egresso.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ egresso.email }}<br>
+                                <small class="text-muted">{{ egresso.number }}</small>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                Nenhum egresso cadastrado.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>        
+
             </table>
         </div>
 

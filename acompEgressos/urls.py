@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
     path("egresso/", include("egresso.urls", namespace="egresso")),
+    path('formularios/', include('formularios.urls')),
 ]

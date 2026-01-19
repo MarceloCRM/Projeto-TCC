@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Estatísticas - {{ formulario.titulo }}</title>
+</head>
+<body>
+
+<h1>Estatísticas</h1>
+<h2>{{ formulario.titulo }}</h2>
+
+{% for item in estatisticas %}
+
+    <h3>{{ item.pergunta }}</h3>
+
+    {% if item.tipo == 'escolha' %}
+        <ul>
+            {% for dado in item.dados %}
+                <li>{{ dado.valor_opcao__texto }} — {{ dado.total }}</li>
+            {% endfor %}
+        </ul>
+
+    {% elif item.tipo == 'numero' %}
+        <p>Média: {{ item.media }}</p>
+
+    {% elif item.tipo == 'booleano' %}
+        <ul>
+            {% for dado in item.dados %}
+                <li>
+                    {{ dado.valor_numero|yesno:"Sim,Não" }} —
+                    {{ dado.total }}
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% elif item.tipo == 'texto' %}
+        <p>Total de respostas: {{ item.total }}</p>
+
+    {% endif %}
+
+{% empty %}
+    <p>Nenhuma estatística disponível.</p>
+{% endfor %}
+
+</body>
+</html>
