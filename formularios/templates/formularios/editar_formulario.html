@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+
+        <!-- COLUNA ESQUERDA -->
+        <div class="col-md-6">
+
+            <!-- Editar formulário -->
+            <div class="card mb-4">
+                <div class="card-header fw-bold">
+                    Editar Formulário
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form_formulario.as_p }}
+
+                        <button type="submit"
+                                name="salvar_formulario"
+                                class="btn btn-primary">
+                            Salvar Formulário
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Adicionar pergunta -->
+            <div class="card">
+                <div class="card-header fw-bold">
+                    Adicionar Pergunta
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form_pergunta.as_p }}
+
+                        <!-- Opções -->
+                        <div id="opcoes" class="mt-3" style="display:none;">
+                            <label class="form-label fw-semibold">Opções</label>
+
+                            <div id="lista-opcoes"></div>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary mt-2"
+                                    onclick="adicionarOpcao()">
+                                + Adicionar opção
+                            </button>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit"
+                                    name="salvar_pergunta"
+                                    class="btn btn-success">
+                                Adicionar Pergunta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COLUNA DIREITA -->
+        <div class="col-md-6">
+
+            <div class="card">
+                <div class="card-header fw-bold">
+                    Perguntas do Formulário
+                </div>
+                <div class="card-body">
+
+                    {% if perguntas %}
+                        <ul class="list-group list-group-flush">
+                            {% for pergunta in perguntas %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <strong>{{ pergunta.ordem }}.</strong>
+                                            {{ pergunta.texto }}
+                                            <span class="badge bg-secondary ms-2">
+                                                {{ pergunta.get_tipo_display }}
+                                            </span>
+
+                                            {% if pergunta.tipo == 'escolha' %}
+                                                <ul class="mt-2">
+                                                    {% for opcao in pergunta.opcoes.all %}
+                                                        <li>{{ opcao.texto }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </div>
+
+                                        <a href="{% url 'formularios:editar_pergunta' pergunta_id=pergunta.id %}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Editar
+                                        </a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Nenhuma pergunta cadastrada.</p>
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+    const tipoSelect = document.getElementById("id_tipo");
+    const opcoesDiv = document.getElementById("opcoes");
+    const listaOpcoes = document.getElementById("lista-opcoes");
+
+    function toggleOpcoes() {
+        if (tipoSelect && tipoSelect.value === "escolha") {
+            opcoesDiv.style.display = "block";
+        } else {
+            opcoesDiv.style.display = "none";
+            listaOpcoes.innerHTML = "";
+        }
+    }
+
+    function adicionarOpcao() {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "opcoes";
+        input.className = "form-control mb-2";
+        input.placeholder = "Nova opção";
+        listaOpcoes.appendChild(input);
+    }
+
+    if (tipoSelect) {
+        tipoSelect.addEventListener("change", toggleOpcoes);
+        toggleOpcoes();
+    }
+</script>
+
+{% endblock %}

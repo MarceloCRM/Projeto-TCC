@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Estatísticas - {{ formulario.titulo }}</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
 
 <h1>Estatísticas</h1>
 <h2>{{ formulario.titulo }}</h2>
@@ -42,5 +37,4 @@
     <p>Nenhuma estatística disponível.</p>
 {% endfor %}
 
-</body>
-</html>
+{% endblock %}

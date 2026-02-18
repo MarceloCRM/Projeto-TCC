@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Formulário: {{ formulario.titulo }}</h1>
+<h2>Adicionar Pergunta</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div id="opcoes" style="display:none;">
+        <p>Opções:</p>
+        <input type="text" name="opcoes"><br>
+        <input type="text" name="opcoes"><br>
+        <input type="text" name="opcoes"><br>
+        <input type="text" name="opcoes"><br>
+    </div>
+
+    <button type="submit">Salvar Pergunta</button>
+</form>
+
+<script>
+    const tipoSelect = document.getElementById("id_tipo");
+    const opcoesDiv = document.getElementById("opcoes");
+
+    function toggleOpcoes() {
+        if (tipoSelect.value === "escolha") {
+            opcoesDiv.style.display = "block";
+        } else {
+            opcoesDiv.style.display = "none";
+        }
+    }
+
+    tipoSelect.addEventListener("change", toggleOpcoes);
+    toggleOpcoes();
+</script>
+{% endblock %}

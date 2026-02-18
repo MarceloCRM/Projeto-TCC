@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Formulários disponíveis</h1>
+    <a href="{% url 'formularios:criar_formulario' %}">Criar novo formulário</a>
+    {% if formularios %}
+        <ul>
+            {% for formulario in formularios %}
+                <li>
+                    <h2>{{ formulario.titulo }}</h2>
+                    <p>{{ formulario.descricao }}</p>
+                    <small>Criado em: {{ formulario.criado_em }}</small>
+                    <br>
+                    <a href="{% url 'formularios:responder' formulario_id=formulario.id %}">Responder formulário</a>
+                    <a href="{% url 'formularios:editar_formulario' formulario_id=formulario.id %}">Editar formulário</a>
+                    <a href="{% url 'formularios:estatisticas' formulario_id=formulario.id %}">Estatísticas</a>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nenhum formulário cadastrado.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Editar Pergunta</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    {% if pergunta.tipo == 'escolha' %}
+        <h3>Opções</h3>
+
+        {% for opcao in pergunta.opcoes.all %}
+            <div>
+                <input type="hidden" name="opcao_id" value="{{ opcao.id }}">
+                <input
+                    type="text"
+                    name="opcao_texto_{{ opcao.id }}"
+                    value="{{ opcao.texto }}"
+                >
+            </div>
+        {% endfor %}
+
+        <hr>
+
+        <h4>Novas opções</h4>
+        <div id="novas-opcoes"></div>
+
+        <button type="button" onclick="adicionarOpcao()">
+            + Adicionar opção
+        </button>
+
+    {% endif %}
+
+    <br><br>
+    <button type="submit">Salvar</button>
+</form>
+
+<script>
+    function adicionarOpcao() {
+        const container = document.getElementById('novas-opcoes');
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'novas_opcoes';
+        input.placeholder = 'Nova opção';
+
+        const br = document.createElement('br');
+
+        container.appendChild(input);
+        container.appendChild(br);
+    }
+</script>
+
+{% endblock %}

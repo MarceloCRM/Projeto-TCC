@@ -19,11 +19,6 @@
             <div>
                 <label>{{ field.label }}</label><br>
                 {{ field }}
-                {% if field.errors %}
-                    <div style="color:red;">
-                        {{ field.errors }}
-                    </div>
-                {% endif %}
             </div>
             <br>
         {% endfor %}
