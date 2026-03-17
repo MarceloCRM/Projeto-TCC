@@ -37,9 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
-    'egresso',
-    'formularios',
+    'apps.core',
+    'apps.egresso',
+    'apps.formularios',
 ]
 
 MIDDLEWARE = [

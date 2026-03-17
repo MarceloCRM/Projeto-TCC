@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Acompanhamento de Egressos{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: #f5f6fa;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0b1220, #0a0f1a);
+            color: #fff;
+        }
+
+        .sidebar .brand {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .sidebar .nav-link {
+            color: #b5c0d0;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #2563eb;
+            color: #fff;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .logout {
+            color: #b5c0d0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout:hover {
+            color: #fff;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before { 
+            content: "/" !important; 
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <aside class="sidebar d-flex flex-column p-3">
+
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-database-fill fs-3 text-primary"></i>
+            <span class="brand">Acompanhamento<br>de Egressos</span>
+        </div>
+
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="{% url 'index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                    <i class="bi bi-bar-chart"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'egresso:listar_egresso' %}" class="nav-link {% if request.resolver_match.url_name == 'listar_egresso' %}active{% endif %}">
+                    <i class="bi bi-people"></i> Egressos
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'formularios:listar_formularios' %}" class="nav-link {% if request.resolver_match.url_name == 'listar_formularios' %}active{% endif %}">
+                    <i class="bi bi-file-earmark-text"></i> Formulários
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="flex-fill p-4">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+</body>
+</html>
