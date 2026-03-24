@@ -1,0 +1,61 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Detalhes do Egresso | Acompanhamento de Egressos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-1">{{ egresso.nome_completo }}</h3>
+        <p class="text-muted mb-0">Informacoes completas do egresso cadastrado.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'egresso:editar_egresso' egresso.id %}" class="btn btn-outline-secondary">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a href="{% url 'egresso:listar_egresso' %}" class="btn btn-primary">
+            Voltar
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h5 class="mb-3">Dados pessoais</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Nome</dt>
+                    <dd class="col-sm-8">{{ egresso.nome_completo }}</dd>
+
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">{{ egresso.email }}</dd>
+
+                    <dt class="col-sm-4">WhatsApp</dt>
+                    <dd class="col-sm-8">{{ egresso.whatsapp|default:"-" }}</dd>
+                </dl>
+            </div>
+
+            <div class="col-md-6">
+                <h5 class="mb-3">Dados academicos e profissionais</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Curso</dt>
+                    <dd class="col-sm-7">{{ egresso.curso }}</dd>
+
+                    <dt class="col-sm-5">Ano de conclusao</dt>
+                    <dd class="col-sm-7">{{ egresso.ano_conclusao }}</dd>
+
+                    <dt class="col-sm-5">Situacao</dt>
+                    <dd class="col-sm-7">{{ egresso.get_situacao_profissional_display }}</dd>
+
+                    <dt class="col-sm-5">Empresa atual</dt>
+                    <dd class="col-sm-7">{{ egresso.empresa_atual|default:"-" }}</dd>
+
+                    <dt class="col-sm-5">Faixa salarial</dt>
+                    <dd class="col-sm-7">{{ egresso.get_faixa_salarial_display|default:"-" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

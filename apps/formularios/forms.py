@@ -1,41 +1,56 @@
 from django import forms
+from apps.egresso.models import Egresso
 from .models import Pergunta, Opcao, Formulario
 
-class FormularioDinamico(forms.Form):
 
-    def __init__(self, *args, perguntas=None, **kwargs):
-        super().__init__(*args, **kwargs)
+# class FormularioDinamico(forms.Form):
 
-        for pergunta in perguntas:
-            field_name = f'pergunta_{pergunta.id}'
+#     def __init__(self, *args, perguntas=None, **kwargs):
+#         super().__init__(*args, **kwargs)
 
-            if pergunta.tipo == Pergunta.TIPO_TEXTO:
-                self.fields[field_name] = forms.CharField(
-                    label=pergunta.texto,
-                    required=pergunta.obrigatoria
-                )
+#         self.fields['egresso'] = forms.ModelChoiceField(
+#             queryset=Egresso.objects.all().order_by('nome_completo'),
+#             label='Egresso',
+#             empty_label='Selecione um egresso',
+#             widget=forms.Select(attrs={'class': 'form-select'}),
+#             required=True,
+#         )
 
-            elif pergunta.tipo == Pergunta.TIPO_NUMERO:
-                self.fields[field_name] = forms.FloatField(
-                    label=pergunta.texto,
-                    required=pergunta.obrigatoria
-                )
+#         for pergunta in perguntas:
+#             field_name = f'pergunta_{pergunta.id}'
 
-            elif pergunta.tipo == Pergunta.TIPO_BOOLEANO:
-                self.fields[field_name] = forms.BooleanField(
-                    label=pergunta.texto,
-                    required=False
-                )
+#             if pergunta.tipo == Pergunta.TIPO_TEXTO:
+#                 self.fields[field_name] = forms.CharField(
+#                     label=pergunta.texto,
+#                     required=pergunta.obrigatoria
+#                 )
 
-            elif pergunta.tipo == Pergunta.TIPO_ESCOLHA:
-                self.fields[field_name] = forms.ChoiceField(
-                    label=pergunta.texto,
-                    choices=[
-                        (op.id, op.texto) for op in pergunta.opcoes.all()
-                    ],
-                    widget=forms.RadioSelect,
-                    required=pergunta.obrigatoria
-                )
+#             elif pergunta.tipo == Pergunta.TIPO_NUMERO:
+#                 self.fields[field_name] = forms.FloatField(
+#                     label=pergunta.texto,
+#                     required=pergunta.obrigatoria
+#                 )
+
+#             elif pergunta.tipo == Pergunta.TIPO_ESCALA:
+#                 self.fields[field_name] = forms.TypedChoiceField(
+#                     label=pergunta.texto,
+#                     choices=[(valor, str(valor)) for valor in range(1, 6)],
+#                     coerce=int,
+#                     empty_value=None,
+#                     widget=forms.RadioSelect,
+#                     required=pergunta.obrigatoria
+#                 )
+
+#             elif pergunta.tipo == Pergunta.TIPO_ESCOLHA:
+#                 self.fields[field_name] = forms.ChoiceField(
+#                     label=pergunta.texto,
+#                     choices=[
+#                         (op.id, op.texto) for op in pergunta.opcoes.all()
+#                     ],
+#                     widget=forms.RadioSelect,
+#                     required=pergunta.obrigatoria
+#                 )
+
 
 class FormularioForm(forms.ModelForm):
     class Meta:
@@ -44,11 +59,11 @@ class FormularioForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Título do formulário'
+                'placeholder': 'Titulo do formulario'
             }),
             'descricao': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Descrição do formulário',
+                'placeholder': 'Descricao do formulario',
                 'rows': 3
             }),
         }
@@ -80,6 +95,6 @@ class OpcaoForm(forms.ModelForm):
         widgets = {
             'texto': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Texto da opção'
+                'placeholder': 'Texto da opcao'
             }),
         }

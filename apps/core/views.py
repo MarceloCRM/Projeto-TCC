@@ -9,7 +9,7 @@ def index(request):
     formulario = Formulario.objects.all()
     total_form = formulario.count()
 
-    template_name = "index.html"
+    template_name = "core/index.html"
     context = {
         "egresso_total" : total_egre,
         "formulario_total" : total_form

@@ -1,0 +1,124 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Egressos | Acompanhamento de Egressos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h3>Egressos</h3>
+    <a href="{% url 'egresso:criar_egresso' %}" class="btn btn-primary"> Novo Egresso </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <!-- Filtros -->
+        <form method="get" class="row g-2 mb-2">
+
+            <div class="col-md-4">
+                {{ form_filtro.busca }}
+            </div>
+
+            <div class="col-md-3">
+                {{ form_filtro.curso }}
+            </div>
+
+            <div class="col-md-1">
+                {{ form_filtro.ano_conclusao }}
+            </div>
+
+            <div class="col-md-2">
+                {{ form_filtro.situacao_profissional }}
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-outline-primary w-100">
+                    Buscar
+                </button>
+
+                <a href="{% url 'egresso:listar_egresso' %}" class="btn btn-secondary w-100">
+                    Limpar
+                </a>
+            </div>
+
+        </form>
+
+        <div class="mb-2 text-muted">
+            Total: {{ total }}
+        </div>
+        <!-- Tabela -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Curso</th>
+                        <th>Ano</th>
+                        <th>Situação</th>
+                        <th>Empresa</th>
+                        <th>Email</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabela-egressos">
+                    {% if egressos %}
+                    {% for eg in egressos %}
+                    <tr>
+                        <td class="fw-bold">{{ eg.nome_completo }}</td>
+                        <td>{{ eg.curso }}</td>
+                        <td>{{ eg.ano_conclusao }}</td>
+                        <td>{{ eg.get_situacao_profissional_display }}</td>
+                        <td>{{ eg.empresa_atual|default:"-" }}</td>
+                        <td>{{ eg.email }}</td>
+
+                        <!-- Ações -->
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+
+                                <a href="{% url 'egresso:detalhe_egresso' eg.id %}" class="btn btn-sm btn-outline-info"
+                                    title="Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <a href="{% url 'egresso:editar_egresso' eg.id %}"
+                                    class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <a href="{% url 'egresso:excluir_egresso' eg.id %}"
+                                    class="btn btn-sm btn-outline-danger" title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            Nenhum egresso encontrado.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- Script de filtro em tempo real -->
+<script>
+    function filtrarEgressos(valor) {
+        const filtro = valor.toLowerCase();
+        const linhas = document.querySelectorAll('#tabela-egressos tr');
+
+        linhas.forEach(linha => {
+            const texto = linha.innerText.toLowerCase();
+            linha.style.display = texto.includes(filtro) ? '' : 'none';
+        });
+    }
+</script>
+
+{% endblock %}

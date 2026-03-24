@@ -4,23 +4,27 @@ from apps.egresso.models import Egresso
 @admin.register(Egresso)
 class EgressoAdmin(admin.ModelAdmin):
     list_display = (
-        'fullName',
-        'birthDate',
-        'gender',
-        'status',
+        'nome_completo',
         'email',
-        'number',
+        'curso',
+        'ano_conclusao',
+        'situacao_profissional',
+        'empresa_atual',
+        'faixa_salarial',
     )
 
     search_fields = (
-        'fullName',
+        'nome_completo',
         'email',
-        'number',
+        'whatsapp',
+        'curso',
     )
 
     list_filter = (
-        'gender',
-        'status',
+        'situacao_profissional',
+        'faixa_salarial',
+        'curso',
+        'ano_conclusao',
     )
 
-    ordering = ('fullName',)
+    ordering = ('nome_completo',)
