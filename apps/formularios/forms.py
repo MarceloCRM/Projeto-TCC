@@ -55,7 +55,7 @@ from .models import Pergunta, Opcao, Formulario
 class FormularioForm(forms.ModelForm):
     class Meta:
         model = Formulario
-        fields = ['titulo', 'descricao']
+        fields = ['titulo', 'descricao', 'status']
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -66,7 +66,36 @@ class FormularioForm(forms.ModelForm):
                 'placeholder': 'Descricao do formulario',
                 'rows': 3
             }),
+            'status': forms.Select(attrs={
+                'class': 'form-select'
+            }),
         }
+
+
+class FormularioFiltroForm(forms.Form):
+    busca = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Buscar por titulo ou descricao'
+        })
+    )
+
+    status = forms.ChoiceField(
+        required=False,
+        choices=[('', 'Status')] + Formulario.STATUS_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
+    )
+
+    criado_em = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        })
+    )
 
 
 class PerguntaForm(forms.ModelForm):

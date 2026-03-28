@@ -1,11 +1,22 @@
-from django.db import models
-from apps.egresso.models import Egresso
 import uuid
+
+from django.db import models
+
+from apps.egresso.models import Egresso
 
 
 class Formulario(models.Model):
+    STATUS_ATIVO = 'ativo'
+    STATUS_INATIVO = 'inativo'
+
+    STATUS_CHOICES = [
+        (STATUS_ATIVO, 'Ativo'),
+        (STATUS_INATIVO, 'Inativo'),
+    ]
+
     titulo = models.CharField(max_length=200)
     descricao = models.TextField(blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_ATIVO)
     criado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -55,45 +66,31 @@ class RespostaFormulario(models.Model):
     utilizado = models.BooleanField('Utilizado', default=False)
 
     def __str__(self):
-        return f"Link #{self.egresso.nome_completo} - {self.formulario.titulo}"
+        return f'Link #{self.egresso.nome_completo} - {self.formulario.titulo}'
 
 
 class Resposta(models.Model):
-    """
-    Conjunto de respostas de um egresso a um formulario.
-    Cada egresso só pode responder uma vez por formulario.
-    """
-
-    formulario = models.ForeignKey(
-        Formulario,
+    resposta_formulario = models.OneToOneField(
+        RespostaFormulario,
         on_delete=models.CASCADE,
-        related_name='respostas',
-        verbose_name='Formulario',
-    )
-    egresso = models.ForeignKey(
-        Egresso,
-        on_delete=models.CASCADE,
-        related_name='respostas',
-        verbose_name='Egresso',
+        related_name='resposta',
+        verbose_name='Resposta do Formulario',
     )
     enviado_em = models.DateTimeField('Enviado em', auto_now_add=True)
 
     class Meta:
-        # Garante unicidade: um egresso responde uma vez por formulario
-        unique_together = ['formulario', 'egresso']
         ordering = ['-enviado_em']
         verbose_name = 'Resposta'
         verbose_name_plural = 'Respostas'
 
     def __str__(self):
-        return f'{self.egresso.nome_completo} → {self.questionario.titulo}'
+        return (
+            f'{self.resposta_formulario.egresso.nome_completo} -> '
+            f'{self.resposta_formulario.formulario.titulo}'
+        )
 
-    def __str__(self):
-        return f"Resposta a pergunta {self.pergunta.id}"
 
-class Alternativa(models.Model):
-    """Alternativa individual de uma Resposta para uma Pergunta."""
-
+class RespostaPergunta(models.Model):
     resposta = models.ForeignKey(
         Resposta,
         on_delete=models.CASCADE,
@@ -109,8 +106,8 @@ class Alternativa(models.Model):
     valor = models.TextField('Valor da Resposta')
 
     class Meta:
-        verbose_name = 'Alternativa'
-        verbose_name_plural = 'Alternativas'
+        verbose_name = 'Resposta da Pergunta'
+        verbose_name_plural = 'Respostas das Perguntas'
 
     def __str__(self):
-        return f'Resposta para: {self.questao.texto[:40]}'
+        return f'Resposta para: {self.pergunta.texto[:40]}'

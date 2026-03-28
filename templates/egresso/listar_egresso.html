@@ -5,20 +5,17 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
     <h3>Egressos</h3>
-    <a href="{% url 'egresso:criar_egresso' %}" class="btn btn-primary"> Novo Egresso </a>
+    <a href="{% url 'egresso:criar_egresso' %}" class="btn btn-primary">Novo Egresso</a>
 </div>
 
 <div class="card shadow-sm">
     <div class="card-body">
-
-        <!-- Filtros -->
         <form method="get" class="row g-2 mb-2">
-
-            <div class="col-md-4">
+            <div class="col-md-3">
                 {{ form_filtro.busca }}
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 {{ form_filtro.curso }}
             </div>
 
@@ -30,6 +27,10 @@
                 {{ form_filtro.situacao_profissional }}
             </div>
 
+            <div class="col-md-2">
+                {{ form_filtro.status }}
+            </div>
+
             <div class="col-md-2 d-flex gap-2">
                 <button class="btn btn-outline-primary w-100">
                     Buscar
@@ -39,13 +40,12 @@
                     Limpar
                 </a>
             </div>
-
         </form>
 
-        <div class="mb-2 text-muted">
+        <div class="mb-2 text-muted" style="margin-left: 5px;">
             Total: {{ total }}
         </div>
-        <!-- Tabela -->
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0 small">
                 <thead class="table-light">
@@ -53,62 +53,57 @@
                         <th>Nome</th>
                         <th>Curso</th>
                         <th>Ano</th>
-                        <th>Situação</th>
+                        <th>Status</th>
+                        <th>Situacao</th>
                         <th>Empresa</th>
                         <th>Email</th>
-                        <th class="text-center">Ações</th>
+                        <th class="text-center">Acoes</th>
                     </tr>
                 </thead>
 
                 <tbody id="tabela-egressos">
                     {% if egressos %}
-                    {% for eg in egressos %}
-                    <tr>
-                        <td class="fw-bold">{{ eg.nome_completo }}</td>
-                        <td>{{ eg.curso }}</td>
-                        <td>{{ eg.ano_conclusao }}</td>
-                        <td>{{ eg.get_situacao_profissional_display }}</td>
-                        <td>{{ eg.empresa_atual|default:"-" }}</td>
-                        <td>{{ eg.email }}</td>
+                        {% for eg in egressos %}
+                            <tr>
+                                <td class="fw-bold">{{ eg.nome_completo }}</td>
+                                <td>{{ eg.curso }}</td>
+                                <td>{{ eg.ano_conclusao }}</td>
+                                <td>
+                                    {% if eg.status == 'ativo' %}
+                                        <span class="badge bg-success-subtle text-success border">Ativo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary border">Inativo</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ eg.get_situacao_profissional_display }}</td>
+                                <td>{{ eg.empresa_atual|default:"-" }}</td>
+                                <td>{{ eg.email }}</td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{% url 'egresso:detalhe_egresso' eg.id %}" class="btn btn-sm btn-outline-info" title="Detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
 
-                        <!-- Ações -->
-                        <td>
-                            <div class="d-flex justify-content-center gap-2">
-
-                                <a href="{% url 'egresso:detalhe_egresso' eg.id %}" class="btn btn-sm btn-outline-info"
-                                    title="Detalhes">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-
-                                <a href="{% url 'egresso:editar_egresso' eg.id %}"
-                                    class="btn btn-sm btn-outline-secondary" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-
-                                <a href="{% url 'egresso:excluir_egresso' eg.id %}"
-                                    class="btn btn-sm btn-outline-danger" title="Excluir">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                                        <a href="{% url 'egresso:editar_egresso' eg.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
                     {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">
-                            Nenhum egresso encontrado.
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">
+                                Nenhum egresso encontrado.
+                            </td>
+                        </tr>
                     {% endif %}
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
-<!-- Script de filtro em tempo real -->
 <script>
     function filtrarEgressos(valor) {
         const filtro = valor.toLowerCase();

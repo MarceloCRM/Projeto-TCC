@@ -1,37 +1,148 @@
 {% extends 'core/base.html' %}
+
+{% block title %}Criar Pergunta | {{ formulario.titulo }}{% endblock %}
+
 {% block content %}
+<div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'formularios:listar_formularios' %}" class="text-decoration-none">Formularios</a></li>
+                <li class="breadcrumb-item active">Adicionar pergunta</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold mb-0">{{ formulario.titulo }}</h2>
+        <p class="text-muted mb-0 mt-1">Cadastre as perguntas que vao compor este formulario.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'formularios:editar_formulario' formulario_id=formulario.id %}" class="btn btn-outline-secondary">
+            <i class="bi bi-pencil-square me-1"></i> Editar formulario
+        </a>
+        <a href="{% url 'formularios:listar_formularios' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
 
-<h1>Formulário: {{ formulario.titulo }}</h1>
-<h2>Adicionar Pergunta</h2>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header py-3 px-4 fw-bold">
+                Nova pergunta
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
 
-    <div id="opcoes" style="display:none;">
-        <p>Opções:</p>
-        <input type="text" name="opcoes"><br>
-        <input type="text" name="opcoes"><br>
-        <input type="text" name="opcoes"><br>
-        <input type="text" name="opcoes"><br>
+                    <div class="mb-3">
+                        <label for="{{ form.texto.id_for_label }}" class="form-label fw-semibold">Texto da pergunta</label>
+                        {{ form.texto }}
+                        {% if form.texto.errors %}
+                            <div class="text-danger small mt-1">{{ form.texto.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label fw-semibold">Tipo de resposta</label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                                <div class="text-danger small mt-1">{{ form.tipo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <label for="{{ form.ordem.id_for_label }}" class="form-label fw-semibold">Ordem</label>
+                            {{ form.ordem }}
+                            {% if form.ordem.errors %}
+                                <div class="text-danger small mt-1">{{ form.ordem.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="opcoes" class="mt-4" style="display:none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-semibold mb-0">Opcoes de escolha</label>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="adicionarOpcao()">
+                                <i class="bi bi-plus-lg me-1"></i> Adicionar opcao
+                            </button>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            Preencha as alternativas exibidas quando o tipo da pergunta for escolha.
+                        </p>
+                        <div id="lista-opcoes" class="d-grid gap-2">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 1">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 2">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 3">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 4">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-plus-circle me-1"></i> Salvar pergunta
+                        </button>
+                        <a href="{% url 'formularios:editar_formulario' formulario_id=formulario.id %}" class="btn btn-outline-primary">
+                            Ver perguntas cadastradas
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <button type="submit">Salvar Pergunta</button>
-</form>
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header py-3 px-4 fw-bold">
+                Resumo do formulario
+            </div>
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-2">{{ formulario.titulo }}</h5>
+                {% if formulario.descricao %}
+                    <p class="text-muted mb-3">{{ formulario.descricao }}</p>
+                {% else %}
+                    <p class="text-muted mb-3">Este formulario ainda nao possui descricao cadastrada.</p>
+                {% endif %}
+
+                <div class="bg-light rounded p-3 small text-muted">
+                    Use perguntas objetivas e mantenha uma ordem logica para facilitar o preenchimento.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     const tipoSelect = document.getElementById("id_tipo");
     const opcoesDiv = document.getElementById("opcoes");
+    const listaOpcoes = document.getElementById("lista-opcoes");
 
     function toggleOpcoes() {
-        if (tipoSelect.value === "escolha") {
+        if (tipoSelect && tipoSelect.value === "escolha") {
             opcoesDiv.style.display = "block";
         } else {
             opcoesDiv.style.display = "none";
         }
     }
 
-    tipoSelect.addEventListener("change", toggleOpcoes);
-    toggleOpcoes();
+    function adicionarOpcao() {
+        const quantidade = listaOpcoes.querySelectorAll('input[name="opcoes"]').length + 1;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "opcoes";
+        input.className = "form-control";
+        input.placeholder = `Opcao ${quantidade}`;
+        listaOpcoes.appendChild(input);
+    }
+
+    if (tipoSelect) {
+        tipoSelect.addEventListener("change", toggleOpcoes);
+        toggleOpcoes();
+    }
 </script>
 {% endblock %}

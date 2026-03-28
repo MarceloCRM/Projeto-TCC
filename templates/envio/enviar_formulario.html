@@ -1,6 +1,5 @@
 {% extends 'core/base.html' %}
-{% block title %}Enviar Questionários{% endblock %}
-{% block page_title %}Enviar Questionários{% endblock %}
+{% block title %}Enviar Questionários | Acompanhamento de Egressos{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -16,40 +15,128 @@
     #select-all-label {
         cursor: pointer;
     }
+
+    .contact-icon {
+        font-size: 1.15rem;
+        cursor: help;
+    }
+
+    .alumni-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .alumni-check-col {
+        width: 56px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .alumni-name-col {
+        width: 44%;
+    }
+
+    .alumni-table > :not(caption) > * > .alumni-name-col {
+        padding-left: 0;
+    }
+
+    .alumni-meta-col {
+        width: 32%;
+        vertical-align: middle;
+    }
+
+    .alumni-actions-col {
+        width: 84px;
+        white-space: nowrap;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .filter-panel {
+        background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
+    }
+
+    .filter-label {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.3rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .filter-panel .form-control,
+    .filter-panel .form-select {
+        min-height: 38px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 0.7rem;
+        border-color: #dbe4f0;
+        box-shadow: none;
+    }
+
+    .filter-panel .form-control:focus,
+    .filter-panel .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: end;
+        height: 100%;
+    }
+
+    .filter-actions .btn {
+        min-height: 38px;
+        padding: 0.4rem 0.85rem;
+        font-size: 0.9rem;
+        border-radius: 0.7rem;
+    }
+
+    @media (max-width: 991.98px) {
+        .alumni-name-col,
+        .alumni-check-col,
+        .alumni-meta-col,
+        .alumni-actions-col {
+            width: auto;
+        }
+
+        .filter-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row g-4">
     <div class="col-lg-8">
+        <form id="filterForm" method="get"></form>
 
         <form method="post" id="sendForm">
             {% csrf_token %}
 
-            <!-- STEP 1 -->
             <div class="card mb-4">
                 <div class="card-header py-3 px-4">
                     <span class="fw-semibold">
-                        <span class="badge bg-primary me-2">1</span>Selecionar Questionário
+                        <span class="badge bg-primary me-2">1</span>Selecionar Questionario
                     </span>
                 </div>
 
                 <div class="card-body p-4">
                     <select name="formulario_id" class="form-select" required>
-                        <option value="">Escolha um questionário...</option>
-
+                        <option value="">Escolha um questionario...</option>
                         {% for f in formularios %}
-                        <option value="{{ f.pk }}">
-                            {{ f.titulo }}
-                        </option>
+                            <option value="{{ f.pk }}">{{ f.titulo }}</option>
                         {% endfor %}
-
                     </select>
                 </div>
             </div>
 
-
-            <!-- STEP 2 -->
             <div class="card mb-4">
                 <div class="card-header py-3 px-4">
                     <span class="fw-semibold">
@@ -59,18 +146,15 @@
 
                 <div class="card-body p-4">
                     <div class="row g-3">
-
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3 d-flex align-items-center gap-3">
-                                <input type="checkbox" name="canais" value="whatsapp" class="form-check-input"
-                                    style="width:1.2rem;height:1.2rem">
+                                <input type="checkbox" name="canais" value="whatsapp" class="form-check-input" style="width:1.2rem;height:1.2rem">
 
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
                                         <i class="bi bi-whatsapp text-success fs-5"></i>
                                         <strong>WhatsApp</strong>
                                     </div>
-
                                     <small class="text-muted">Envio via Twilio</small>
                                 </div>
                             </div>
@@ -78,245 +162,225 @@
 
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3 d-flex align-items-center gap-3">
-
-                                <input type="checkbox" name="canais" value="email" class="form-check-input"
-                                    style="width:1.2rem;height:1.2rem">
+                                <input type="checkbox" name="canais" value="email" class="form-check-input" style="width:1.2rem;height:1.2rem">
 
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
                                         <i class="bi bi-envelope-fill text-primary fs-5"></i>
                                         <strong>Email</strong>
                                     </div>
-
                                     <small class="text-muted">Envio via SendGrid</small>
                                 </div>
-
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-
-            <!-- STEP 3 -->
             <div class="card mb-4">
-                <div class="card-header py-3 px-4">
-                    <span class="fw-semibold">
-                        <span class="badge bg-primary me-2">3</span>Filtrar Egressos
-                    </span>
-                </div>
-
-                <div class="card-body p-4">
-
-                    <div class="row g-3">
-
-                        {{ formulario_filtro.curso }}
-                        {{ formulario_filtro.ano_conclusao }}
-                        {{ formulario_filtro.situacao_profissional }}
-
-                        <div>
-
-                            <button type="submit" formmethod="get" class="btn btn-outline-primary btn-sm">
-
-                                <i class="bi bi-funnel me-1"></i>
-                                Aplicar filtros
-
-                            </button>
-
-                            <a href="{% url 'envio:enviar_formulario' %}" class="btn btn-outline-secondary btn-sm ms-2">
-
-                                Limpar
-
-                            </a>
-
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- STEP 4 -->
-            <div class="card mb-4">
-
                 <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center">
-
                     <span class="fw-semibold">
-                        <span class="badge bg-primary me-2">4</span>Selecionar Egressos
+                        <span class="badge bg-primary me-2">3</span>Selecionar Egressos
                     </span>
 
                     <span class="badge bg-secondary" id="selected-count">
                         0 selecionados
                     </span>
-
                 </div>
 
-
                 <div class="card-body p-0">
+                    <div class="p-4 border-bottom filter-panel">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-7">
+                                <label for="filtro-busca" class="filter-label">Busca</label>
+                                <input
+                                    id="filtro-busca"
+                                    form="filterForm"
+                                    type="text"
+                                    name="busca"
+                                    class="form-control"
+                                    placeholder="Nome ou email"
+                                    value="{{ request.GET.busca|default:'' }}"
+                                >
+                            </div>
 
-                    <div class="p-3 border-bottom bg-light">
+                            <div class="col-md-5">
+                                <label for="filtro-curso" class="filter-label">Curso</label>
+                                <input
+                                    id="filtro-curso"
+                                    form="filterForm"
+                                    type="text"
+                                    name="curso"
+                                    class="form-control"
+                                    placeholder="Curso"
+                                    value="{{ request.GET.curso|default:'' }}"
+                                >
+                            </div>
+                            <div class="col-md-2">
+                                <label for="filtro-ano" class="filter-label">Ano</label>
+                                <input
+                                    id="filtro-ano"
+                                    form="filterForm"
+                                    type="number"
+                                    name="ano_conclusao"
+                                    class="form-control"
+                                    placeholder="Ano"
+                                    value="{{ request.GET.ano_conclusao|default:'' }}"
+                                >
+                            </div>
 
-                        <div class="form-check">
+                            <div class="col-md-3">
+                                <label for="filtro-situacao" class="filter-label">Situacao</label>
+                                <select id="filtro-situacao" form="filterForm" name="situacao_profissional" class="form-select">
+                                    {% for value, label in form_filtro.fields.situacao_profissional.choices %}
+                                        <option value="{{ value }}" {% if request.GET.situacao_profissional == value|default:'' %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
-                            <input type="checkbox" id="select-all" class="form-check-input">
+                            <div class="col-md-3">
+                                <label for="filtro-status" class="filter-label">Status</label>
+                                <select id="filtro-status" form="filterForm" name="status" class="form-select">
+                                    {% for value, label in form_filtro.fields.status.choices %}
+                                        <option value="{{ value }}" {% if request.GET.status == value|default:'' %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
-                            <label for="select-all" id="select-all-label" class="form-check-label fw-semibold small">
+                            <div class="col-md-4">
+                                <div class="filter-actions">
+                                    <button type="submit" form="filterForm" class="btn btn-outline-primary flex-fill">
+                                        <i class="bi bi-funnel me-1"></i>
+                                        Aplicar
+                                    </button>
 
-                                Selecionar todos ({{ egressos.count }})
-
-                            </label>
-
+                                    <a href="{% url 'envio:enviar_formulario' %}" class="btn btn-outline-secondary flex-fill">
+                                        Limpar
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-
                     </div>
 
+                    <div class="p-3 border-bottom bg-light">
+                        <div class="form-check">
+                            <input type="checkbox" id="select-all" class="form-check-input">
+                            <label for="select-all" id="select-all-label" class="form-check-label fw-semibold small">
+                                Selecionar todos ({{ egressos.count }})
+                            </label>
+                        </div>
+                    </div>
 
                     <div style="max-height:400px;overflow-y:auto">
-
-                        <table class="table table-hover mb-0">
-
+                        <table class="table table-hover mb-0 alumni-table">
                             <tbody>
-
                                 {% for egresso in egressos %}
+                                    <tr class="alumni-row" onclick="toggleRow(this)">
+                                        <td class="alumni-check-col">
+                                            <input type="checkbox" name="ids_egressos" value="{{ egresso.pk }}" class="alumni-check form-check-input" onclick="event.stopPropagation()">
+                                        </td>
 
-                                <tr class="alumni-row" onclick="toggleRow(this)">
+                                        <td class="alumni-name-col">
+                                            <div class="fw-semibold">
+                                                {{ egresso.nome_completo }}
+                                            </div>
 
-                                    <td class="ps-4" style="width:40px">
+                                            <small class="text-muted">
+                                                {{ egresso.email }}
+                                            </small>
+                                        </td>
 
-                                        <input type="checkbox" name="ids_egressos" value="{{ egresso.pk }}"
-                                            class="alumni-check form-check-input" onclick="event.stopPropagation()">
+                                        <td class="alumni-meta-col text-muted">
+                                                {{ egresso.curso }} | {{ egresso.ano_conclusao }}
+                                        </td>
 
-                                    </td>
-
-                                    <td>
-
-                                        <div class="fw-semibold">
-                                            {{ egresso.nome }}
-                                        </div>
-
-                                        <small class="text-muted">
-                                            {{ egresso.email }}
-                                        </small>
-
-                                    </td>
-
-                                    <td class="text-muted small">
-                                        {{ egresso.curso }}
-                                    </td>
-
-                                    <td>
-
-                                        {% if egresso.whatsapp %}
-                                        <i class="bi bi-whatsapp text-success me-1"></i>
-                                        {% endif %}
-
-                                        <i class="bi bi-envelope text-primary"></i>
-
-                                    </td>
-
-                                </tr>
-
+                                        <td class="alumni-actions-col">
+                                            {% if egresso.whatsapp %}
+                                                <i class="bi bi-whatsapp text-success me-2 contact-icon"
+                                                   title="WhatsApp: {{ egresso.whatsapp }}"></i>
+                                            {% endif %}
+                                            <i class="bi bi-envelope text-primary contact-icon"
+                                               title="Email: {{ egresso.email }}"></i>
+                                        </td>
+                                    </tr>
                                 {% empty %}
-
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
-                                        Nenhum egresso encontrado.
-                                    </td>
-                                </tr>
-
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            Nenhum egresso encontrado.
+                                        </td>
+                                    </tr>
                                 {% endfor %}
-
                             </tbody>
-
                         </table>
-
                     </div>
                 </div>
             </div>
-
 
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="bi bi-send-fill me-2"></i>
-                    Enviar Questionário
+                    Enviar Questionario
                 </button>
             </div>
-
         </form>
     </div>
 
-
-    <!-- painel lateral -->
     <div class="col-lg-4">
-
-        <div class="card sticky-top" style="top:80px">
-
+        <div class="card sticky-top" style="top:24px">
             <div class="card-header py-3 px-4">
                 <i class="bi bi-info-circle me-2 text-primary"></i>
                 Como funciona
             </div>
 
             <div class="card-body p-4">
-
                 <p class="text-muted small">
-                    Selecione um questionário, escolha os canais de envio e marque os egressos que irão receber o link
-                    para responder.
+                    Selecione um questionario, escolha os canais de envio e marque os egressos que irao receber o link para responder.
                 </p>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 {% endblock %}
 
-
 {% block extra_js %}
 <script>
-
     function toggleRow(row) {
-
         const checkbox = row.querySelector('.alumni-check');
-
         checkbox.checked = !checkbox.checked;
-
         row.classList.toggle('selected', checkbox.checked);
-
         updateCount();
-
     }
 
     document.getElementById('select-all').addEventListener('change', function () {
-
         document.querySelectorAll('.alumni-check').forEach(cb => {
-
             cb.checked = this.checked;
-
             cb.closest('tr').classList.toggle('selected', this.checked);
-
         });
 
         updateCount();
-
     });
-
 
     document.querySelectorAll('.alumni-check').forEach(cb => {
-        cb.addEventListener('change', updateCount);
+        cb.addEventListener('change', function () {
+            this.closest('tr').classList.toggle('selected', this.checked);
+            syncSelectAll();
+            updateCount();
+        });
     });
 
+    function syncSelectAll() {
+        const checkboxes = document.querySelectorAll('.alumni-check');
+        const checked = document.querySelectorAll('.alumni-check:checked');
+        const selectAll = document.getElementById('select-all');
 
-    function updateCount() {
-
-        const count = document.querySelectorAll('.alumni-check:checked').length;
-
-        document.getElementById('selected-count').textContent =
-            count + ' selecionados';
-
+        selectAll.checked = checkboxes.length > 0 && checked.length === checkboxes.length;
     }
 
+    function updateCount() {
+        const count = document.querySelectorAll('.alumni-check:checked').length;
+        document.getElementById('selected-count').textContent = count + ' selecionados';
+    }
+
+    syncSelectAll();
 </script>
 {% endblock %}

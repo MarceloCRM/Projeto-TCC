@@ -1,16 +1,45 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from apps.formularios.models import Formulario
+from apps.egresso.forms import EgressoFiltroForm
 from apps.egresso.models import Egresso
 
 from .services import enviar_formulario_egresso
 
 
 def enviar_formulario(request):
-    formularios = Formulario.objects.all()
-    egressos = Egresso.objects.all()
+    formularios = Formulario.objects.filter(status=Formulario.STATUS_ATIVO)
+    egressos = Egresso.objects.filter(status=Egresso.STATUS_ATIVO)
+    form_filtro = EgressoFiltroForm(request.GET)
+
+    if form_filtro.is_valid():
+        busca = form_filtro.cleaned_data.get('busca')
+        curso = form_filtro.cleaned_data.get('curso')
+        ano = form_filtro.cleaned_data.get('ano_conclusao')
+        situacao = form_filtro.cleaned_data.get('situacao_profissional')
+        status = form_filtro.cleaned_data.get('status')
+
+        if busca:
+            egressos = egressos.filter(
+                Q(nome_completo__icontains=busca) |
+                Q(email__icontains=busca) |
+                Q(curso__icontains=busca)
+            )
+
+        if curso:
+            egressos = egressos.filter(curso__icontains=curso)
+
+        if ano:
+            egressos = egressos.filter(ano_conclusao=ano)
+
+        if situacao:
+            egressos = egressos.filter(situacao_profissional=situacao)
+
+        if status:
+            egressos = egressos.filter(status=status)
 
     if request.method == 'POST':
         formulario_id = request.POST.get('formulario_id')
@@ -53,6 +82,7 @@ def enviar_formulario(request):
     contexto = {
         'formularios': formularios,
         'egressos': egressos,
+        'form_filtro': form_filtro,
     }
 
     return render(request, 'envio/enviar_formulario.html', contexto)

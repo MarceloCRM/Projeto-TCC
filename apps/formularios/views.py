@@ -1,8 +1,89 @@
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import FormularioForm, PerguntaForm
-from .models import Alternativa, Formulario, Opcao, Pergunta, Resposta, RespostaFormulario
+from .forms import FormularioFiltroForm, FormularioForm, PerguntaForm
+from .models import Formulario, Opcao, Pergunta, Resposta, RespostaFormulario, RespostaPergunta
+
+
+def listar_formularios(request):
+    formularios = Formulario.objects.all().order_by('-criado_em')
+    form_filtro = FormularioFiltroForm(request.GET)
+
+    if form_filtro.is_valid():
+        busca = form_filtro.cleaned_data.get('busca')
+        status = form_filtro.cleaned_data.get('status')
+        criado_em = form_filtro.cleaned_data.get('criado_em')
+
+        if busca:
+            formularios = formularios.filter(
+                Q(titulo__icontains=busca) |
+                Q(descricao__icontains=busca)
+            )
+
+        if status:
+            formularios = formularios.filter(status=status)
+
+        if criado_em:
+            formularios = formularios.filter(criado_em__date=criado_em)
+
+    return render(request, 'formularios/listar_formularios.html', {
+        'formularios': formularios,
+        'form_filtro': form_filtro,
+        'total': formularios.count(),
+    })
+
+
+def criar_formulario(request):
+    if request.method == 'POST':
+        form = FormularioForm(request.POST)
+        if form.is_valid():
+            formulario = form.save()
+            return redirect('formularios:criar_pergunta', formulario_id=formulario.id)
+    else:
+        form = FormularioForm()
+
+    return render(request, 'formularios/criar_formulario.html', {'form': form})
+
+
+def editar_formulario(request, formulario_id):
+    formulario = get_object_or_404(Formulario, id=formulario_id)
+
+    form_formulario = FormularioForm(instance=formulario)
+    form_pergunta = PerguntaForm()
+
+    if request.method == 'POST':
+        if 'salvar_formulario' in request.POST:
+            form_formulario = FormularioForm(request.POST, instance=formulario)
+            if form_formulario.is_valid():
+                form_formulario.save()
+                return redirect('formularios:editar_formulario', formulario_id=formulario.id)
+
+        elif 'salvar_pergunta' in request.POST:
+            form_pergunta = PerguntaForm(request.POST)
+            if form_pergunta.is_valid():
+                pergunta = form_pergunta.save(commit=False)
+                pergunta.formulario = formulario
+                pergunta.save()
+
+                if pergunta.tipo == Pergunta.TIPO_ESCOLHA:
+                    opcoes = request.POST.getlist('opcoes')
+                    for texto in opcoes:
+                        if texto.strip():
+                            Opcao.objects.create(
+                                pergunta=pergunta,
+                                texto=texto,
+                            )
+
+                return redirect('formularios:editar_formulario', formulario_id=formulario.id)
+
+    perguntas = formulario.perguntas.all()
+
+    return render(request, 'formularios/editar_formulario.html', {
+        'formulario': formulario,
+        'form_formulario': form_formulario,
+        'form_pergunta': form_pergunta,
+        'perguntas': perguntas,
+    })
 
 
 def criar_pergunta(request, formulario_id):
@@ -34,74 +115,53 @@ def criar_pergunta(request, formulario_id):
     })
 
 
-def criar_formulario(request):
+def editar_pergunta(request, pergunta_id):
+    pergunta = get_object_or_404(Pergunta, id=pergunta_id)
+    formulario = pergunta.formulario
+
     if request.method == 'POST':
-        form = FormularioForm(request.POST)
+        form = PerguntaForm(request.POST, instance=pergunta)
+
         if form.is_valid():
-            formulario = form.save()
-            return redirect('formularios:criar_pergunta', formulario_id=formulario.id)
+            pergunta = form.save()
+            if pergunta.tipo == Pergunta.TIPO_ESCOLHA:
+                opcao_ids = request.POST.getlist('opcao_id')
+
+                for opcao_id in opcao_ids:
+                    texto = request.POST.get(f'opcao_texto_{opcao_id}')
+                    if texto:
+                        Opcao.objects.filter(
+                            id=opcao_id,
+                            pergunta=pergunta,
+                        ).update(texto=texto)
+
+                novas_opcoes = request.POST.getlist('novas_opcoes')
+
+                for texto in novas_opcoes:
+                    if texto.strip():
+                        Opcao.objects.create(
+                            pergunta=pergunta,
+                            texto=texto,
+                        )
+
+            return redirect('formularios:editar_formulario', formulario_id=formulario.id)
     else:
-        form = FormularioForm()
+        form = PerguntaForm(instance=pergunta)
 
-    return render(request, 'formularios/criar_formulario.html', {'form': form})
-
-
-def listar_formularios(request):
-    formularios = Formulario.objects.all()
-    return render(request, 'formularios/listar_formularios.html', {'formularios': formularios})
-
-
-def obrigado(request):
-    return render(request, 'formularios/obrigado.html')
-
-
-# def responder_formulario(request, formulario_id):
-#     formulario = get_object_or_404(Formulario, id=formulario_id)
-#     perguntas = formulario.perguntas.all()
-
-#     if request.method == 'POST':
-#         form = FormularioDinamico(request.POST, perguntas=perguntas)
-
-#         if form.is_valid():
-#             egresso = form.cleaned_data['egresso']
-#             resposta_form = RespostaFormulario.objects.create(
-#                 formulario=formulario,
-#                 egresso=egresso,
-#             )
-
-#             for pergunta in perguntas:
-#                 field_name = f'pergunta_{pergunta.id}'
-#                 valor = form.cleaned_data.get(field_name)
-
-#                 Alternativa.objects.create(
-#                     resposta=Resposta.objects.get_or_create(
-#                         formulario=formulario,
-#                         egresso=egresso,
-#                     )[0],
-#                     pergunta=pergunta,
-#                     valor=str(valor) if valor is not None else '',
-#                 )
-
-#             resposta_form.utilizado = True
-#             resposta_form.save(update_fields=['utilizado'])
-
-#             return redirect('formularios:obrigado')
-#     else:
-#         form = FormularioDinamico(perguntas=perguntas)
-
-#     return render(request, 'formularios/responder_simples.html', {
-#         'formulario': formulario,
-#         'form': form,
-#     })
-
+    return render(request, 'formularios/editar_pergunta.html', {
+        'form': form,
+        'formulario': formulario,
+        'pergunta': pergunta,
+    })
 
 def estatisticas_formulario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     estatisticas = []
 
     for pergunta in formulario.perguntas.all():
-        respostas_pergunta = Alternativa.objects.filter(
-            resposta__formulario=formulario,
+        # Caminho ORM: RespostaPergunta -> Resposta -> RespostaFormulario -> Formulario.
+        respostas_pergunta = RespostaPergunta.objects.filter(
+            resposta__resposta_formulario__formulario=formulario,
             pergunta=pergunta,
         )
         total_respostas = respostas_pergunta.count()
@@ -171,93 +231,15 @@ def estatisticas_formulario(request, formulario_id):
                 'total_geral': total_respostas,
             })
 
-    total_envios = formulario.respostas.count()
+    # Conta Resposta vinculada a RespostaFormulario do formulario atual.
+    total_envios = Resposta.objects.filter(
+        resposta_formulario__formulario=formulario,
+    ).count()
 
     return render(request, 'formularios/estatisticas.html', {
         'formulario': formulario,
         'estatisticas': estatisticas,
         'total_envios': total_envios,
-    })
-
-
-def editar_formulario(request, formulario_id):
-    formulario = get_object_or_404(Formulario, id=formulario_id)
-
-    form_formulario = FormularioForm(instance=formulario)
-    form_pergunta = PerguntaForm()
-
-    if request.method == 'POST':
-        if 'salvar_formulario' in request.POST:
-            form_formulario = FormularioForm(request.POST, instance=formulario)
-            if form_formulario.is_valid():
-                form_formulario.save()
-                return redirect('formularios:editar_formulario', formulario_id=formulario.id)
-
-        elif 'salvar_pergunta' in request.POST:
-            form_pergunta = PerguntaForm(request.POST)
-            if form_pergunta.is_valid():
-                pergunta = form_pergunta.save(commit=False)
-                pergunta.formulario = formulario
-                pergunta.save()
-
-                if pergunta.tipo == Pergunta.TIPO_ESCOLHA:
-                    opcoes = request.POST.getlist('opcoes')
-                    for texto in opcoes:
-                        if texto.strip():
-                            Opcao.objects.create(
-                                pergunta=pergunta,
-                                texto=texto,
-                            )
-
-                return redirect('formularios:editar_formulario', formulario_id=formulario.id)
-
-    perguntas = formulario.perguntas.all()
-
-    return render(request, 'formularios/editar_formulario.html', {
-        'formulario': formulario,
-        'form_formulario': form_formulario,
-        'form_pergunta': form_pergunta,
-        'perguntas': perguntas,
-    })
-
-
-def editar_pergunta(request, pergunta_id):
-    pergunta = get_object_or_404(Pergunta, id=pergunta_id)
-    formulario = pergunta.formulario
-
-    if request.method == 'POST':
-        form = PerguntaForm(request.POST, instance=pergunta)
-
-        if form.is_valid():
-            pergunta = form.save()
-            if pergunta.tipo == Pergunta.TIPO_ESCOLHA:
-                opcao_ids = request.POST.getlist('opcao_id')
-
-                for opcao_id in opcao_ids:
-                    texto = request.POST.get(f'opcao_texto_{opcao_id}')
-                    if texto:
-                        Opcao.objects.filter(
-                            id=opcao_id,
-                            pergunta=pergunta,
-                        ).update(texto=texto)
-
-                novas_opcoes = request.POST.getlist('novas_opcoes')
-
-                for texto in novas_opcoes:
-                    if texto.strip():
-                        Opcao.objects.create(
-                            pergunta=pergunta,
-                            texto=texto,
-                        )
-
-            return redirect('formularios:editar_formulario', formulario_id=formulario.id)
-    else:
-        form = PerguntaForm(instance=pergunta)
-
-    return render(request, 'formularios/editar_pergunta.html', {
-        'form': form,
-        'formulario': formulario,
-        'pergunta': pergunta,
     })
 
 
@@ -272,8 +254,7 @@ def responder_questionario(request, token):
 
     if request.method == 'POST':
         resposta, _ = Resposta.objects.get_or_create(
-            formulario=formulario,
-            egresso=link.egresso,
+            resposta_formulario=link,
         )
 
         resposta.alternativas.all().delete()
@@ -281,7 +262,7 @@ def responder_questionario(request, token):
         for pergunta in perguntas:
             valor = request.POST.get(f'pergunta_{pergunta.pk}', '').strip()
             if valor:
-                Alternativa.objects.create(
+                RespostaPergunta.objects.create(
                     resposta=resposta,
                     pergunta=pergunta,
                     valor=valor,
@@ -297,3 +278,7 @@ def responder_questionario(request, token):
         'perguntas': perguntas,
         'egresso': link.egresso,
     })
+
+
+def obrigado(request):
+    return render(request, 'formularios/obrigado.html')

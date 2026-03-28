@@ -7,7 +7,7 @@ def index(request):
     total_egre = egressos.count()
 
     formulario = Formulario.objects.all()
-    total_form = formulario.count()
+    total_form = formulario.filter(status='ativo').count()
 
     template_name = "core/index.html"
     context = {

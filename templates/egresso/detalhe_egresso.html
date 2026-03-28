@@ -48,6 +48,15 @@
                     <dt class="col-sm-5">Situacao</dt>
                     <dd class="col-sm-7">{{ egresso.get_situacao_profissional_display }}</dd>
 
+                    <dt class="col-sm-5">Status</dt>
+                    <dd class="col-sm-7">
+                        {% if egresso.status == 'ativo' %}
+                            <span class="badge bg-success-subtle text-success border">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border">Inativo</span>
+                        {% endif %}
+                    </dd>
+
                     <dt class="col-sm-5">Empresa atual</dt>
                     <dd class="col-sm-7">{{ egresso.empresa_atual|default:"-" }}</dd>
 

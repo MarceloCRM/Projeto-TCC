@@ -6,6 +6,7 @@ class EgressoAdmin(admin.ModelAdmin):
     list_display = (
         'nome_completo',
         'email',
+        'status',
         'curso',
         'ano_conclusao',
         'situacao_profissional',
@@ -21,6 +22,7 @@ class EgressoAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        'status',
         'situacao_profissional',
         'faixa_salarial',
         'curso',

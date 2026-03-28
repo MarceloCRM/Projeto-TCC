@@ -15,7 +15,8 @@ class PerguntaInline(admin.TabularInline):
 
 @admin.register(Formulario)
 class FormularioAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'criado_em')
+    list_display = ('titulo', 'status', 'criado_em')
+    list_filter = ('status',)
     inlines = [PerguntaInline]
 
 

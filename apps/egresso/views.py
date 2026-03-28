@@ -1,12 +1,12 @@
 from django.db.models import Q
-from django.shortcuts import redirect, render, get_object_or_404
-from apps.egresso.forms import EgressoForm, EgressoFiltroForm
+from django.shortcuts import get_object_or_404, redirect, render
+
+from apps.egresso.forms import EgressoFiltroForm, EgressoForm
 from apps.egresso.models import Egresso
 
 
 def listar_egresso(request):
     egressos = Egresso.objects.all().order_by('-criado_em')
-
     form_filtro = EgressoFiltroForm(request.GET)
 
     if form_filtro.is_valid():
@@ -14,6 +14,7 @@ def listar_egresso(request):
         curso = form_filtro.cleaned_data.get('curso')
         ano = form_filtro.cleaned_data.get('ano_conclusao')
         situacao = form_filtro.cleaned_data.get('situacao_profissional')
+        status = form_filtro.cleaned_data.get('status')
 
         if busca:
             egressos = egressos.filter(
@@ -31,16 +32,20 @@ def listar_egresso(request):
         if situacao:
             egressos = egressos.filter(situacao_profissional=situacao)
 
+        if status:
+            egressos = egressos.filter(status=status)
+
     context = {
         'egressos': egressos,
         'form_filtro': form_filtro,
-        'total': egressos.count()
+        'total': egressos.count(),
     }
 
     return render(request, 'egresso/listar_egresso.html', context)
 
+
 def criar_egresso(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = EgressoForm(request.POST)
         if form.is_valid():
             form.save()
@@ -48,43 +53,33 @@ def criar_egresso(request):
     else:
         form = EgressoForm()
 
-    return render(request, template_name="egresso/criar_egresso.html", context={"form": form})
+    return render(request, template_name='egresso/criar_egresso.html', context={'form': form})
+
 
 def editar_egresso(request, pk):
     egresso = get_object_or_404(Egresso, pk=pk)
-    if request.method == "POST":
+
+    if request.method == 'POST':
         form = EgressoForm(request.POST, instance=egresso)
         if form.is_valid():
             form.save()
             return redirect('egresso:listar_egresso')
     else:
         form = EgressoForm(instance=egresso)
-    
+
     context = {
-        "form" : form,
-        "egressos": egresso
+        'form': form,
+        'egressos': egresso,
     }
 
-    return render(request, template_name="egresso/editar_egresso.html", context=context)
+    return render(request, template_name='egresso/editar_egresso.html', context=context)
 
-def excluir_egresso(request, pk):
-    egresso = get_object_or_404(Egresso, pk=pk)
-
-    if request.method == "POST":
-        egresso.delete()
-        return redirect('egresso:listar_egresso')
-
-    return render(
-        request,
-        template_name="egresso/confirmar_exclusao.html",
-        context={"egresso": egresso},
-    )
 
 def detalhe_egresso(request, pk):
     egresso = get_object_or_404(Egresso, pk=pk)
 
     return render(
         request,
-        template_name="egresso/detalhe_egresso.html",
-        context={"egresso": egresso},
+        template_name='egresso/detalhe_egresso.html',
+        context={'egresso': egresso},
     )
