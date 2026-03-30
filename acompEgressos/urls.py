@@ -24,4 +24,5 @@ urlpatterns = [
     path("egresso/", include("apps.egresso.urls", namespace="egresso")),
     path('formularios/', include('apps.formularios.urls')),
     path('envio/', include('apps.envio.urls')),
+    path('estatistica/', include('apps.estatistica.urls', namespace='estatistica')),
 ]
