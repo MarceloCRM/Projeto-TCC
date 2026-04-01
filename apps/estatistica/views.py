@@ -1,13 +1,18 @@
-from django.shortcuts import render, get_object_or_404
-from django.db.models import Count, Avg, Max, Min, Q
-from apps.formularios.models import Formulario, Pergunta, Resposta, RespostaPergunta, Opcao
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, render
+
+from apps.formularios.models import Formulario, FormularioEgresso, Pergunta, Resposta
 
 def index(request):
     query = request.GET.get('q')
     status_filter = request.GET.get('status')
     
     formularios = Formulario.objects.annotate(
-        total_respostas=Count('links__resposta', distinct=True)
+        total_respostas=Count(
+            'links',
+            filter=Q(links__respostas__isnull=False),
+            distinct=True,
+        )
     )
 
     if query:
@@ -29,7 +34,14 @@ def detalhe_formulario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     
     # Total de respostas enviadas
-    total_respostas = Resposta.objects.filter(resposta_formulario__formulario=formulario).count()
+    total_respostas = (
+        FormularioEgresso.objects.filter(
+            formulario=formulario,
+            respostas__isnull=False,
+        )
+        .distinct()
+        .count()
+    )
     
     # Total de perguntas
     perguntas = formulario.perguntas.all()
@@ -41,8 +53,8 @@ def detalhe_formulario(request, formulario_id):
     
     # Data da última resposta
     ultima_resposta = Resposta.objects.filter(
-        resposta_formulario__formulario=formulario
-    ).order_by('-enviado_em').first()
+        formulario_egresso__formulario=formulario
+    ).order_by('-respondido_em').first()
 
     # Processamento de estatísticas por pergunta
     estatisticas_perguntas = []
@@ -55,7 +67,7 @@ def detalhe_formulario(request, formulario_id):
             'tem_respostas': False
         }
         
-        respostas_qs = RespostaPergunta.objects.filter(pergunta=pergunta)
+        respostas_qs = Resposta.objects.filter(pergunta=pergunta)
         dados_pergunta['total_respostas_pergunta'] = respostas_qs.count()
         
         if dados_pergunta['total_respostas_pergunta'] > 0:
@@ -106,7 +118,7 @@ def detalhe_formulario(request, formulario_id):
                     
             elif pergunta.tipo == Pergunta.TIPO_TEXTO:
                 # Lista de respostas recentes
-                dados_pergunta['stats']['ultimas_respostas'] = respostas_qs.order_by('-resposta__enviado_em')[:5]
+                dados_pergunta['stats']['ultimas_respostas'] = respostas_qs.order_by('-respondido_em')[:5]
         
         estatisticas_perguntas.append(dados_pergunta)
 

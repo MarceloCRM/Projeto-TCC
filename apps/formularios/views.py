@@ -1,8 +1,9 @@
-from django.db.models import Avg, Count, Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .forms import FormularioFiltroForm, FormularioForm, PerguntaForm
-from .models import Formulario, Opcao, Pergunta, Resposta, RespostaFormulario, RespostaPergunta
+from .models import Formulario, FormularioEgresso, Opcao, Pergunta, Resposta
 
 
 def listar_formularios(request):
@@ -154,8 +155,9 @@ def editar_pergunta(request, pergunta_id):
         'pergunta': pergunta,
     })
 
+
 def responder_questionario(request, token):
-    link = get_object_or_404(RespostaFormulario, token=token)
+    link = get_object_or_404(FormularioEgresso, token=token)
 
     if link.utilizado:
         return render(request, 'formularios/ja_respondido.html', {'link': link})
@@ -164,19 +166,17 @@ def responder_questionario(request, token):
     perguntas = formulario.perguntas.prefetch_related('opcoes').all()
 
     if request.method == 'POST':
-        resposta, _ = Resposta.objects.get_or_create(
-            resposta_formulario=link,
-        )
-
-        resposta.alternativas.all().delete()
+        respondido_em = timezone.now()
+        link.respostas.all().delete()
 
         for pergunta in perguntas:
             valor = request.POST.get(f'pergunta_{pergunta.pk}', '').strip()
             if valor:
-                RespostaPergunta.objects.create(
-                    resposta=resposta,
+                Resposta.objects.create(
+                    formulario_egresso=link,
                     pergunta=pergunta,
                     valor=valor,
+                    respondido_em=respondido_em,
                 )
 
         link.utilizado = True

@@ -60,7 +60,7 @@ def enviar_formulario_egresso(form, egresso_list, channels):
     """
     Send a survey to a list of egresso via selected channels.
     """
-    from apps.formularios.models import RespostaFormulario
+    from apps.formularios.models import FormularioEgresso
 
     results = {
         'total': len(egresso_list),
@@ -70,7 +70,7 @@ def enviar_formulario_egresso(form, egresso_list, channels):
     }
 
     for egresso in egresso_list:
-        link_formulario, _ = RespostaFormulario.objects.get_or_create(
+        link_formulario, _ = FormularioEgresso.objects.get_or_create(
             formulario=form,
             egresso=egresso,
         )

@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 from apps.egresso.models import Egresso
 
@@ -57,7 +58,7 @@ class Opcao(models.Model):
         return self.texto
 
 
-class RespostaFormulario(models.Model):
+class FormularioEgresso(models.Model):
     formulario = models.ForeignKey(Formulario, on_delete=models.CASCADE, related_name='links', verbose_name='Questionario')
     egresso = models.ForeignKey(Egresso, models.CASCADE, related_name='links', verbose_name='Egresso')
 
@@ -70,32 +71,11 @@ class RespostaFormulario(models.Model):
 
 
 class Resposta(models.Model):
-    resposta_formulario = models.OneToOneField(
-        RespostaFormulario,
+    formulario_egresso = models.ForeignKey(
+        FormularioEgresso,
         on_delete=models.CASCADE,
-        related_name='resposta',
-        verbose_name='Resposta do Formulario',
-    )
-    enviado_em = models.DateTimeField('Enviado em', auto_now_add=True)
-
-    class Meta:
-        ordering = ['-enviado_em']
-        verbose_name = 'Resposta'
-        verbose_name_plural = 'Respostas'
-
-    def __str__(self):
-        return (
-            f'{self.resposta_formulario.egresso.nome_completo} -> '
-            f'{self.resposta_formulario.formulario.titulo}'
-        )
-
-
-class RespostaPergunta(models.Model):
-    resposta = models.ForeignKey(
-        Resposta,
-        on_delete=models.CASCADE,
-        related_name='alternativas',
-        verbose_name='Resposta',
+        related_name='respostas',
+        verbose_name='Formulario do Egresso',
     )
     pergunta = models.ForeignKey(
         Pergunta,
@@ -104,10 +84,17 @@ class RespostaPergunta(models.Model):
     )
     # Armazena o valor como texto independente do tipo da pergunta
     valor = models.TextField('Valor da Resposta')
+    respondido_em = models.DateTimeField('Respondido em', default=timezone.now)
 
     class Meta:
-        verbose_name = 'Resposta da Pergunta'
-        verbose_name_plural = 'Respostas das Perguntas'
+        verbose_name = 'Resposta'
+        verbose_name_plural = 'Respostas'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['formulario_egresso', 'pergunta'],
+                name='uniq_resposta_por_formulario_egresso_pergunta',
+            ),
+        ]
 
     def __str__(self):
         return f'Resposta para: {self.pergunta.texto[:40]}'
