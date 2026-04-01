@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Estatísticas de Formulários | Acompanhamento de Egressos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold">Estatísticas por Formulário</h2>
+            <p class="text-muted">Selecione um formulário para visualizar os dados e análises detalhadas.</p>
+        </div>
+    </div>
+
+    <!-- Filtros e Busca -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{% url 'estatistica:index' %}" class="row g-3">
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Buscar por título ou descrição..." value="{{ request.GET.q }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">Todos os Status</option>
+                        <option value="ativo" {% if request.GET.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                        <option value="inativo" {% if request.GET.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                    {% if request.GET.q or request.GET.status %}
+                    <a href="{% url 'estatistica:index' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for formulario in formularios %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title fw-bold mb-0">{{ formulario.titulo }}</h5>
+                        {% if formulario.status == 'ativo' %}
+                        <span class="badge bg-success-soft text-success px-2 py-1">Ativo</span>
+                        {% else %}
+                        <span class="badge bg-secondary-soft text-secondary px-2 py-1">Inativo</span>
+                        {% endif %}
+                    </div>
+                    <p class="card-text text-muted small flex-grow-1">
+                        {{ formulario.descricao|truncatewords:20|default:"Sem descrição disponível." }}
+                    </p>
+                    <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="bi bi-chat-left-text me-1"></i> {{ formulario.total_respostas }} respostas
+                        </div>
+                        <a href="{% url 'estatistica:detalhe_formulario' formulario.id %}" class="btn btn-primary btn-sm px-3">
+                            Ver Estatísticas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="mb-3">
+                <i class="bi bi-file-earmark-x fs-1 text-muted"></i>
+            </div>
+            <h5 class="text-muted">Nenhum formulário disponível.</h5>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        transition: all 0.3s ease;
+    }
+    .bg-success-soft { background-color: rgba(34, 197, 94, 0.1); }
+    .bg-secondary-soft { background-color: rgba(108, 117, 125, 0.1); }
+</style>
+{% endblock %}

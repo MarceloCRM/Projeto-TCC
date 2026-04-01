@@ -101,7 +101,7 @@ class FormularioFiltroForm(forms.Form):
 class PerguntaForm(forms.ModelForm):
     class Meta:
         model = Pergunta
-        fields = ['texto', 'tipo', 'ordem']
+        fields = ['texto', 'tipo', 'ordem', 'obrigatoria']
         widgets = {
             'texto': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -114,6 +114,7 @@ class PerguntaForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ordem da pergunta'
             }),
+            'obrigatoria': forms.CheckboxInput(),
         }
 
 

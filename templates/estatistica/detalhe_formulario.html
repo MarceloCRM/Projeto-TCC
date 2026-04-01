@@ -1,0 +1,201 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Estatísticas: {{ formulario.titulo }} | Acompanhamento de Egressos{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'estatistica:index' %}" class="text-decoration-none">Estatísticas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ formulario.titulo|truncatechars:30 }}</li>
+        </ol>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-1">{{ formulario.titulo }}</h2>
+            <p class="text-muted mb-0">{{ formulario.descricao|default:"Sem descrição." }}</p>
+        </div>
+    </div>
+
+    {% if total_respostas > 0 %}
+    <!-- Summary Cards (Section A) -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted d-block mb-1">Total de Respostas</small>
+                    <h3 class="fw-bold mb-0">{{ total_respostas }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted d-block mb-1">Total de Perguntas</small>
+                    <h3 class="fw-bold mb-0">{{ total_perguntas }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted d-block mb-1">Obrigatórias / Opcionais</small>
+                    <h3 class="fw-bold mb-0 text-primary">{{ perguntas_obrigatorias }} <span class="text-muted fs-6 fw-normal">/ {{ perguntas_opcionais }}</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted d-block mb-1">Última Resposta</small>
+                    <h6 class="fw-bold mb-0 mt-1">{{ ultima_resposta.enviado_em|date:"d/m/Y H:i" }}</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question-by-question Statistics (Section B) -->
+    <div class="row g-4">
+        <div class="col-12">
+            <h4 class="fw-bold mb-4">Análise por Pergunta</h4>
+        </div>
+
+        {% for item in estatisticas_perguntas %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">{{ forloop.counter }}</span>
+                        <h5 class="fw-bold mb-0 ms-1">{{ item.pergunta.texto }}</h5>
+                    </div>
+                    <span class="badge bg-light text-muted fw-normal">{{ item.pergunta.get_tipo_display }}</span>
+                </div>
+                
+                <div class="card-body pt-0">
+                    <div class="text-muted small mb-3">Total de respostas para esta pergunta: <strong>{{ item.total_respostas_pergunta }}</strong></div>
+                    
+                    {% if item.tem_respostas %}
+                        
+                        {% if item.pergunta.tipo == 'escolha' %}
+                        <!-- Estatística de Múltipla Escolha -->
+                        <div class="row g-4 align-items-center">
+                            <div class="col-md-7">
+                                {% for op in item.stats.distribuicao %}
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small fw-bold">{{ op.texto }}</span>
+                                        <span class="small text-muted">{{ op.quantidade }} ({{ op.percentual }}%)</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ op.percentual }}%" aria-valuenow="{{ op.percentual }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-5 d-none d-md-block text-center">
+                                <!-- Chart.js placeholder -->
+                                <div style="height: 180px; width: 100%;">
+                                    <canvas class="perguntaChart" data-type="doughnut" data-labels="{{ item.stats.distribuicao|safe }}" data-values="{{ item.stats.distribuicao|safe }}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% elif item.pergunta.tipo == 'escala' %}
+                        <!-- Estatística de Escala 1 a 5 -->
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center border-end">
+                                <h1 class="display-3 fw-bold text-primary mb-0">{{ item.stats.media }}</h1>
+                                <div class="text-warning fs-5">
+                                    {% with ""|center:5 as range %}
+                                    {% for _ in range %}
+                                        <i class="bi {% if forloop.counter <= item.stats.media %}bi-star-fill{% elif forloop.counter|add:"-0.5" <= item.stats.media %}bi-star-half{% else %}bi-star{% endif %}"></i>
+                                    {% endfor %}
+                                    {% endwith %}
+                                </div>
+                                <p class="text-muted small mt-1">Média de Avaliação</p>
+                            </div>
+                            <div class="col-md-8 ps-md-4">
+                                <div class="row g-2">
+                                    {% for nota, data in item.stats.distribuicao.items %}
+                                    <div class="col-12 d-flex align-items-center gap-2 mb-1">
+                                        <div class="small fw-bold" style="width: 50px;">Nota {{ nota }}</div>
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ data.percentual }}%"></div>
+                                        </div>
+                                        <div class="small text-muted" style="width: 40px;">{{ data.percentual }}%</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% elif item.pergunta.tipo == 'numero' %}
+                        <!-- Estatística Numérica -->
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded text-center">
+                                    <small class="text-muted d-block mb-1">Média</small>
+                                    <h4 class="fw-bold mb-0">{{ item.stats.media }}</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded text-center">
+                                    <small class="text-muted d-block mb-1">Mínimo</small>
+                                    <h4 class="fw-bold mb-0 text-secondary">{{ item.stats.min }}</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded text-center">
+                                    <small class="text-muted d-block mb-1">Máximo</small>
+                                    <h4 class="fw-bold mb-0 text-secondary">{{ item.stats.max }}</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% elif item.pergunta.tipo == 'texto' %}
+                        <!-- Lista de Respostas de Texto -->
+                        <div class="bg-light p-3 rounded">
+                            <h6 class="fw-bold small mb-3">Últimas 5 respostas:</h6>
+                            <ul class="list-group list-group-flush bg-transparent">
+                                {% for resp in item.stats.ultimas_respostas %}
+                                <li class="list-group-item bg-transparent px-0 py-2 small border-0">
+                                    <i class="bi bi-quote text-primary me-1"></i> {{ resp.valor }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                    {% else %}
+                        <!-- Empty state para pergunta sem resposta -->
+                        <div class="text-center py-3 bg-light rounded border border-dashed">
+                            <p class="text-muted small mb-0">Esta pergunta ainda não possui respostas.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty state para formulário sem nenhuma resposta -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm py-5">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-chat-left-dots fs-1 text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">Este formulário ainda não possui respostas.</h5>
+                    <p class="small text-muted">Assim que os egressos começarem a responder, os dados aparecerão aqui.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
