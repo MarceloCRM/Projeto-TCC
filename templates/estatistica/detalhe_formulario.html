@@ -2,6 +2,184 @@
 
 {% block title %}Estatísticas: {{ formulario.titulo }} | Acompanhamento de Egressos{% endblock %}
 
+{% block extra_css %}
+<style>
+    .choice-stats .choice-option:nth-child(6n + 1) .progress-bar,
+    .choice-stats .choice-chart-bar-item:nth-child(6n + 1) .choice-chart-bar {
+        background-color: #2563eb !important;
+    }
+
+    .choice-stats .choice-option:nth-child(6n + 2) .progress-bar,
+    .choice-stats .choice-chart-bar-item:nth-child(6n + 2) .choice-chart-bar {
+        background-color: #f97316 !important;
+    }
+
+    .choice-stats .choice-option:nth-child(6n + 3) .progress-bar,
+    .choice-stats .choice-chart-bar-item:nth-child(6n + 3) .choice-chart-bar {
+        background-color: #10b981 !important;
+    }
+
+    .choice-stats .choice-option:nth-child(6n + 4) .progress-bar,
+    .choice-stats .choice-chart-bar-item:nth-child(6n + 4) .choice-chart-bar {
+        background-color: #eab308 !important;
+    }
+
+    .choice-stats .choice-option:nth-child(6n + 5) .progress-bar,
+    .choice-stats .choice-chart-bar-item:nth-child(6n + 5) .choice-chart-bar {
+        background-color: #8b5cf6 !important;
+    }
+
+    .choice-stats .choice-option:nth-child(6n) .progress-bar,
+    .choice-stats .choice-chart-bar-item:nth-child(6n) .choice-chart-bar {
+        background-color: #ef4444 !important;
+    }
+
+    .choice-chart {
+        height: 260px;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 0.75rem;
+        background-color: #fff;
+    }
+
+    .choice-chart-scroll {
+        width: 100%;
+        height: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+    }
+
+    .choice-chart-bars {
+        height: 100%;
+        min-width: 100%;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(88px, 1fr);
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .choice-chart-bar-item {
+        min-width: 0;
+        height: 100%;
+        display: grid;
+        grid-template-rows: 1.5rem minmax(0, 1fr) 3.2rem;
+        align-items: stretch;
+    }
+
+    .choice-chart-value {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d;
+        line-height: 1;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 0.35rem;
+    }
+
+    .choice-chart-bar-wrap {
+        width: 100%;
+        display: flex;
+        align-items: end;
+        min-height: 0;
+    }
+
+    .choice-chart-bar-track {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: end;
+        border-radius: 0.75rem 0.75rem 0 0;
+        background-color: #f8f9fa;
+        overflow: hidden;
+    }
+
+    .choice-chart-bar {
+        width: 100%;
+        min-height: 8px;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .choice-chart-label {
+        width: 100%;
+        min-width: 0;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 0.65rem;
+        text-align: center;
+    }
+
+    .choice-chart-label-text {
+        display: -webkit-box;
+        max-width: 100%;
+        max-height: 2.4em;
+        padding-inline: 0.25rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+        word-break: break-word;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .scale-stats .scale-row:nth-child(5n + 1) .progress-bar,
+    .scale-stats .choice-chart-bar-item:nth-child(5n + 1) .choice-chart-bar {
+        background-color: #2563eb !important;
+    }
+
+    .scale-stats .scale-row:nth-child(5n + 2) .progress-bar,
+    .scale-stats .choice-chart-bar-item:nth-child(5n + 2) .choice-chart-bar {
+        background-color: #f97316 !important;
+    }
+
+    .scale-stats .scale-row:nth-child(5n + 3) .progress-bar,
+    .scale-stats .choice-chart-bar-item:nth-child(5n + 3) .choice-chart-bar {
+        background-color: #10b981 !important;
+    }
+
+    .scale-stats .scale-row:nth-child(5n + 4) .progress-bar,
+    .scale-stats .choice-chart-bar-item:nth-child(5n + 4) .choice-chart-bar {
+        background-color: #eab308 !important;
+    }
+
+    .scale-stats .scale-row:nth-child(5n) .progress-bar,
+    .scale-stats .choice-chart-bar-item:nth-child(5n) .choice-chart-bar {
+        background-color: #8b5cf6 !important;
+    }
+
+    .scale-vertical-chart .choice-chart {
+        height: 220px;
+        padding: 0.75rem;
+    }
+
+    .scale-vertical-chart .choice-chart-bars {
+        grid-auto-columns: minmax(46px, 1fr);
+    }
+
+    @media (max-width: 767.98px) {
+        .choice-chart {
+            height: 240px;
+            padding: 0.875rem;
+        }
+
+        .choice-chart-bars {
+            grid-auto-columns: minmax(72px, 1fr);
+            gap: 0.5rem;
+        }
+
+        .scale-vertical-chart .choice-chart {
+            height: 240px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid pb-5">
     <!-- Breadcrumb -->
@@ -81,32 +259,47 @@
                         
                         {% if item.pergunta.tipo == 'escolha' %}
                         <!-- Estatística de Múltipla Escolha -->
-                        <div class="row g-4 align-items-center">
+                        <div class="row g-4 align-items-center choice-stats">
                             <div class="col-md-7">
                                 {% for op in item.stats.distribuicao %}
-                                <div class="mb-3">
+                                <div class="mb-3 choice-option">
                                     <div class="d-flex justify-content-between mb-1">
                                         <span class="small fw-bold">{{ op.texto }}</span>
                                         <span class="small text-muted">{{ op.quantidade }} ({{ op.percentual }}%)</span>
                                     </div>
                                     <div class="progress" style="height: 10px;">
-                                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ op.percentual }}%" aria-valuenow="{{ op.percentual }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" style="width: {{ op.percentual }}%" aria-valuenow="{{ op.percentual }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 {% endfor %}
                             </div>
-                            <div class="col-md-5 d-none d-md-block text-center">
-                                <!-- Chart.js placeholder -->
-                                <div style="height: 180px; width: 100%;">
-                                    <canvas class="perguntaChart" data-type="doughnut" data-labels="{{ item.stats.distribuicao|safe }}" data-values="{{ item.stats.distribuicao|safe }}"></canvas>
+                            <div class="col-md-5">
+                                <div class="choice-chart" role="img" aria-label="Gráfico de barras com a distribuição das respostas da pergunta {{ item.pergunta.texto }}">
+                                    <div class="choice-chart-scroll">
+                                        <div class="choice-chart-bars" role="list" aria-label="Distribuição das opções">
+                                        {% for op in item.stats.distribuicao %}
+                                        <div class="choice-chart-bar-item" role="listitem" aria-label="{{ op.texto }}: {{ op.quantidade }} respostas, {{ op.percentual }} por cento">
+                                            <span class="choice-chart-value">{{ op.quantidade }}</span>
+                                            <div class="choice-chart-bar-wrap" aria-hidden="true">
+                                                <div class="choice-chart-bar-track">
+                                                    <div class="choice-chart-bar" style="height: {{ op.percentual }}%;"></div>
+                                                </div>
+                                            </div>
+                                            <span class="choice-chart-label">
+                                                <span class="choice-chart-label-text" title="{{ op.texto }}">{{ op.texto }}</span>
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {% elif item.pergunta.tipo == 'escala' %}
                         <!-- Estatística de Escala 1 a 5 -->
-                        <div class="row align-items-center">
-                            <div class="col-md-4 text-center border-end">
+                        <div class="row align-items-center scale-stats">
+                            <div class="col-md-3 text-center border-end">
                                 <h1 class="display-3 fw-bold text-primary mb-0">{{ item.stats.media }}</h1>
                                 <div class="text-warning fs-5">
                                     {% with ""|center:5 as range %}
@@ -117,17 +310,38 @@
                                 </div>
                                 <p class="text-muted small mt-1">Média de Avaliação</p>
                             </div>
-                            <div class="col-md-8 ps-md-4">
+                            <div class="col-md-4 ps-md-3">
                                 <div class="row g-2">
                                     {% for nota, data in item.stats.distribuicao.items %}
-                                    <div class="col-12 d-flex align-items-center gap-2 mb-1">
-                                        <div class="small fw-bold" style="width: 50px;">Nota {{ nota }}</div>
+                                    <div class="col-12 d-flex align-items-center gap-2 mb-1 scale-row">
+                                        <div class="small fw-bold" style="width: 46px;">Nota {{ nota }}</div>
                                         <div class="progress flex-grow-1" style="height: 8px;">
-                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ data.percentual }}%"></div>
+                                            <div class="progress-bar" role="progressbar" style="width: {{ data.percentual }}%"></div>
                                         </div>
-                                        <div class="small text-muted" style="width: 40px;">{{ data.percentual }}%</div>
+                                        <div class="small text-muted" style="width: 38px;">{{ data.percentual }}%</div>
                                     </div>
                                     {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-5 mt-4 mt-md-0 scale-vertical-chart">
+                                <div class="choice-chart" role="img" aria-label="GrÃ¡fico de barras verticais com a distribuiÃ§Ã£o das notas da pergunta {{ item.pergunta.texto }}">
+                                    <div class="choice-chart-scroll">
+                                        <div class="choice-chart-bars" role="list" aria-label="DistribuiÃ§Ã£o das notas de 1 a 5">
+                                            {% for nota, data in item.stats.distribuicao.items %}
+                                            <div class="choice-chart-bar-item" role="listitem" aria-label="Nota {{ nota }}: {{ data.quantidade }} respostas, {{ data.percentual }} por cento">
+                                                <span class="choice-chart-value">{{ data.quantidade }}</span>
+                                                <div class="choice-chart-bar-wrap" aria-hidden="true">
+                                                    <div class="choice-chart-bar-track">
+                                                        <div class="choice-chart-bar" style="height: {{ data.percentual }}%;"></div>
+                                                    </div>
+                                                </div>
+                                                <span class="choice-chart-label">
+                                                    <span class="choice-chart-label-text" title="Nota {{ nota }}">Nota {{ nota }}</span>
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
