@@ -237,15 +237,6 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label for="filtro-situacao" class="filter-label">Situacao</label>
-                                <select id="filtro-situacao" form="filterForm" name="situacao_profissional" class="form-select">
-                                    {% for value, label in form_filtro.fields.situacao_profissional.choices %}
-                                        <option value="{{ value }}" {% if request.GET.situacao_profissional == value|default:'' %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="col-md-3">
                                 <label for="filtro-status" class="filter-label">Status</label>
                                 <select id="filtro-status" form="filterForm" name="status" class="form-select">
                                     {% for value, label in form_filtro.fields.status.choices %}
@@ -423,7 +414,6 @@
         document.getElementById('filtro-busca').value = '';
         document.getElementById('filtro-curso').value = '';
         document.getElementById('filtro-ano').value = '';
-        document.getElementById('filtro-situacao').value = '';
         document.getElementById('filtro-status').value = '';
         document.getElementById('filterForm').submit();
     }

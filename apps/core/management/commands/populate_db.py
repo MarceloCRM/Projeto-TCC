@@ -39,9 +39,6 @@ class Command(BaseCommand):
                 whatsapp=f'119{random.randint(10000000, 99999999)}',
                 curso=random.choice(cursos),
                 ano_conclusao=random.randint(2018, 2024),
-                situacao_profissional=random.choice([c[0] for c in Egresso.SITUACAO_PROFISSIONAL]),
-                empresa_atual=random.choice(empresas) if random.random() > 0.3 else '',
-                faixa_salarial=random.choice([c[0] for c in Egresso.FAIXA_SALARIAL]),
                 status=Egresso.STATUS_ATIVO
             )
             egressos.append(egresso)
@@ -102,7 +99,7 @@ class Command(BaseCommand):
                     valor = ""
                     if p.tipo == Pergunta.TIPO_TEXTO:
                         if p.texto == 'Qual o nome da sua empresa atual?':
-                            valor = egresso.empresa_atual or "Nenhuma"
+                            valor = random.choice(empresas)
                         else:
                             valor = random.choice(['O curso foi excelente!', 'Poderia ter mais aulas práticas.', 'Os professores são muito bons.', 'Aprendi muito sobre lógica.', 'Gostaria de ter visto mais tecnologias modernas.'])
                     elif p.tipo == Pergunta.TIPO_NUMERO:

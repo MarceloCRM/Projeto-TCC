@@ -9,9 +9,6 @@ class EgressoAdmin(admin.ModelAdmin):
         'status',
         'curso',
         'ano_conclusao',
-        'situacao_profissional',
-        'empresa_atual',
-        'faixa_salarial',
     )
 
     search_fields = (
@@ -23,8 +20,6 @@ class EgressoAdmin(admin.ModelAdmin):
 
     list_filter = (
         'status',
-        'situacao_profissional',
-        'faixa_salarial',
         'curso',
         'ano_conclusao',
     )

@@ -15,7 +15,7 @@
                 {{ form_filtro.busca }}
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-3">
                 {{ form_filtro.curso }}
             </div>
 
@@ -24,10 +24,6 @@
             </div>
 
             <div class="col-md-2">
-                {{ form_filtro.situacao_profissional }}
-            </div>
-
-            <div class="col-md-1">
                 {{ form_filtro.status }}
             </div>
 
@@ -52,10 +48,9 @@
                     <tr>
                         <th onclick="sortTable(0)" style="cursor: pointer;">Nome <i class="bi bi-arrow-down-up small text-muted"></i></th>
                         <th onclick="sortTable(1)" style="cursor: pointer;">Curso <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th onclick="sortTable(2)" style="cursor: pointer;">Ano de conclusão <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(2)" style="cursor: pointer;">Ano de conclusao <i class="bi bi-arrow-down-up small text-muted"></i></th>
                         <th onclick="sortTable(3)" style="cursor: pointer;">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th onclick="sortTable(4)" style="cursor: pointer;">Situação <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th class="text-center">Ações</th>
+                        <th class="text-center">Acoes</th>
                     </tr>
                 </thead>
 
@@ -73,7 +68,6 @@
                                         <span class="badge bg-secondary-subtle text-secondary border">Inativo</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ eg.get_situacao_profissional_display }}</td>
                                 <td>
                                     <div class="d-flex justify-content-center gap-2">
                                         <a href="{% url 'egresso:detalhe_egresso' eg.id %}" class="btn btn-sm btn-outline-info" title="Detalhes">
@@ -89,7 +83,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="8" class="text-center text-muted">
+                            <td colspan="5" class="text-center text-muted">
                                 Nenhum egresso encontrado.
                             </td>
                         </tr>
@@ -106,8 +100,7 @@
     function sortTable(n) {
         const tableBody = document.getElementById("tabela-egressos");
         const rows = Array.from(tableBody.querySelectorAll("tr"));
-        
-        // Verifica se há dados na tabela (ignora se for a linha "Nenhum egresso")
+
         if (rows.length === 1 && rows[0].cells.length === 1) return;
 
         let dir = sortOrders[n] === "asc" ? "desc" : "asc";
@@ -117,7 +110,6 @@
             let x = a.cells[n].innerText.toLowerCase().trim();
             let y = b.cells[n].innerText.toLowerCase().trim();
 
-            // Tenta converter para número se for o caso (ex: Ano)
             let xNum = parseFloat(x.replace(/[^\d.-]/g, ''));
             let yNum = parseFloat(y.replace(/[^\d.-]/g, ''));
 
@@ -125,20 +117,17 @@
                 return dir === "asc" ? xNum - yNum : yNum - xNum;
             }
 
-            // Fallback para comparação de string
             return dir === "asc" ? x.localeCompare(y) : y.localeCompare(x);
         });
 
-        // Limpa e reinsere as linhas ordenadas
         tableBody.innerHTML = "";
         sortedRows.forEach(row => tableBody.appendChild(row));
 
-        // Atualiza ícones nos cabeçalhos
         const icons = document.querySelectorAll('thead th i');
         icons.forEach((icon, index) => {
             if (index === n) {
                 icon.className = dir === 'asc' ? 'bi bi-caret-up-fill small text-primary' : 'bi bi-caret-down-fill small text-primary';
-            } else if (index < 7) {
+            } else if (index < 4) {
                 icon.className = 'bi bi-arrow-down-up small text-muted';
             }
         });

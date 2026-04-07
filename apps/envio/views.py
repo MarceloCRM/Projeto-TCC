@@ -1,6 +1,5 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from apps.formularios.models import Formulario
@@ -21,7 +20,6 @@ def enviar_formulario(request):
         busca = form_filtro.cleaned_data.get('busca')
         curso = form_filtro.cleaned_data.get('curso')
         ano = form_filtro.cleaned_data.get('ano_conclusao')
-        situacao = form_filtro.cleaned_data.get('situacao_profissional')
         status = form_filtro.cleaned_data.get('status')
 
         if busca:
@@ -36,9 +34,6 @@ def enviar_formulario(request):
 
         if ano:
             egressos = egressos.filter(ano_conclusao=ano)
-
-        if situacao:
-            egressos = egressos.filter(situacao_profissional=situacao)
 
         if status:
             egressos = egressos.filter(status=status)

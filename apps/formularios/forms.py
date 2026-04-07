@@ -125,6 +125,6 @@ class OpcaoForm(forms.ModelForm):
         widgets = {
             'texto': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Texto da opcao'
+                'placeholder': 'Texto da opção'
             }),
         }

@@ -13,9 +13,6 @@ class EgressoForm(forms.ModelForm):
             'whatsapp',
             'curso',
             'ano_conclusao',
-            'situacao_profissional',
-            'empresa_atual',
-            'faixa_salarial',
             'status',
         ]
         widgets = {
@@ -39,16 +36,6 @@ class EgressoForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ano de Conclusao'
             }),
-            'situacao_profissional': Select(attrs={
-                'class': 'form-select'
-            }),
-            'empresa_atual': TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Empresa Atual'
-            }),
-            'faixa_salarial': Select(attrs={
-                'class': 'form-select'
-            }),
             'status': Select(attrs={
                 'class': 'form-select'
             }),
@@ -59,9 +46,6 @@ class EgressoForm(forms.ModelForm):
             'whatsapp': 'WhatsApp',
             'curso': 'Curso',
             'ano_conclusao': 'Ano de Conclusao',
-            'situacao_profissional': 'Situacao Profissional',
-            'empresa_atual': 'Empresa Atual',
-            'faixa_salarial': 'Faixa Salarial',
             'status': 'Status',
         }
 
@@ -100,14 +84,6 @@ class EgressoFiltroForm(forms.Form):
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'placeholder': 'Ano de conclusão'
-        })
-    )
-
-    situacao_profissional = forms.ChoiceField(
-        required=False,
-        choices=[('', 'Situação')] + Egresso.SITUACAO_PROFISSIONAL,
-        widget=forms.Select(attrs={
-            'class': 'form-select',
         })
     )
 

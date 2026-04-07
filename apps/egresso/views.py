@@ -13,7 +13,6 @@ def listar_egresso(request):
         busca = form_filtro.cleaned_data.get('busca')
         curso = form_filtro.cleaned_data.get('curso')
         ano = form_filtro.cleaned_data.get('ano_conclusao')
-        situacao = form_filtro.cleaned_data.get('situacao_profissional')
         status = form_filtro.cleaned_data.get('status')
 
         if busca:
@@ -28,9 +27,6 @@ def listar_egresso(request):
 
         if ano:
             egressos = egressos.filter(ano_conclusao=ano)
-
-        if situacao:
-            egressos = egressos.filter(situacao_profissional=situacao)
 
         if status:
             egressos = egressos.filter(status=status)
