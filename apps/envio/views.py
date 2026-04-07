@@ -14,6 +14,8 @@ def enviar_formulario(request):
     formularios = Formulario.objects.filter(status=Formulario.STATUS_ATIVO)
     egressos = Egresso.objects.filter(status=Egresso.STATUS_ATIVO)
     form_filtro = EgressoFiltroForm(request.GET)
+    formulario_id_get = request.GET.get('formulario_id')
+    canais_get = request.GET.getlist('canais')
 
     if form_filtro.is_valid():
         busca = form_filtro.cleaned_data.get('busca')
@@ -83,6 +85,8 @@ def enviar_formulario(request):
         'formularios': formularios,
         'egressos': egressos,
         'form_filtro': form_filtro,
+        'formulario_id_get': formulario_id_get,
+        'canais_get': canais_get,
     }
 
     return render(request, 'envio/enviar_formulario.html', contexto)

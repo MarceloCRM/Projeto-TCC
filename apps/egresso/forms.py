@@ -83,7 +83,7 @@ class EgressoFiltroForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Buscar por nome, email ou curso'
+            'placeholder': 'Buscar por nome'
         })
     )
 
@@ -99,15 +99,15 @@ class EgressoFiltroForm(forms.Form):
         required=False,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ano'
+            'placeholder': 'Ano de conclusão'
         })
     )
 
     situacao_profissional = forms.ChoiceField(
         required=False,
-        choices=[('', 'Situacao')] + Egresso.SITUACAO_PROFISSIONAL,
+        choices=[('', 'Situação')] + Egresso.SITUACAO_PROFISSIONAL,
         widget=forms.Select(attrs={
-            'class': 'form-select'
+            'class': 'form-select',
         })
     )
 

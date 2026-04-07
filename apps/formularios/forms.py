@@ -59,11 +59,11 @@ class FormularioForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Titulo do formulario'
+                'placeholder': 'Título do formulário'
             }),
             'descricao': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Descricao do formulario',
+                'placeholder': 'Descrição do formulário',
                 'rows': 3
             }),
             'status': forms.Select(attrs={
@@ -77,7 +77,7 @@ class FormularioFiltroForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Buscar por titulo ou descricao'
+            'placeholder': 'Buscar por título ou descrição'
         })
     )
 

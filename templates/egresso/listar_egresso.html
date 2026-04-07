@@ -19,7 +19,7 @@
                 {{ form_filtro.curso }}
             </div>
 
-            <div class="col-md-1">
+            <div class="col-md-2">
                 {{ form_filtro.ano_conclusao }}
             </div>
 
@@ -27,7 +27,7 @@
                 {{ form_filtro.situacao_profissional }}
             </div>
 
-            <div class="col-md-2">
+            <div class="col-md-1">
                 {{ form_filtro.status }}
             </div>
 
@@ -50,14 +50,12 @@
             <table class="table table-hover align-middle mb-0 small">
                 <thead class="table-light">
                     <tr>
-                        <th>Nome</th>
-                        <th>Curso</th>
-                        <th>Ano</th>
-                        <th>Status</th>
-                        <th>Situacao</th>
-                        <th>Empresa</th>
-                        <th>Email</th>
-                        <th class="text-center">Acoes</th>
+                        <th onclick="sortTable(0)" style="cursor: pointer;">Nome <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(1)" style="cursor: pointer;">Curso <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(2)" style="cursor: pointer;">Ano de conclusão <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(3)" style="cursor: pointer;">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(4)" style="cursor: pointer;">Situação <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
 
@@ -76,8 +74,6 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ eg.get_situacao_profissional_display }}</td>
-                                <td>{{ eg.empresa_atual|default:"-" }}</td>
-                                <td>{{ eg.email }}</td>
                                 <td>
                                     <div class="d-flex justify-content-center gap-2">
                                         <a href="{% url 'egresso:detalhe_egresso' eg.id %}" class="btn btn-sm btn-outline-info" title="Detalhes">
@@ -105,6 +101,49 @@
 </div>
 
 <script>
+    let sortOrders = {};
+
+    function sortTable(n) {
+        const tableBody = document.getElementById("tabela-egressos");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        
+        // Verifica se há dados na tabela (ignora se for a linha "Nenhum egresso")
+        if (rows.length === 1 && rows[0].cells.length === 1) return;
+
+        let dir = sortOrders[n] === "asc" ? "desc" : "asc";
+        sortOrders[n] = dir;
+
+        const sortedRows = rows.sort((a, b) => {
+            let x = a.cells[n].innerText.toLowerCase().trim();
+            let y = b.cells[n].innerText.toLowerCase().trim();
+
+            // Tenta converter para número se for o caso (ex: Ano)
+            let xNum = parseFloat(x.replace(/[^\d.-]/g, ''));
+            let yNum = parseFloat(y.replace(/[^\d.-]/g, ''));
+
+            if (!isNaN(xNum) && !isNaN(yNum) && !isNaN(parseFloat(x)) && !isNaN(parseFloat(y))) {
+                return dir === "asc" ? xNum - yNum : yNum - xNum;
+            }
+
+            // Fallback para comparação de string
+            return dir === "asc" ? x.localeCompare(y) : y.localeCompare(x);
+        });
+
+        // Limpa e reinsere as linhas ordenadas
+        tableBody.innerHTML = "";
+        sortedRows.forEach(row => tableBody.appendChild(row));
+
+        // Atualiza ícones nos cabeçalhos
+        const icons = document.querySelectorAll('thead th i');
+        icons.forEach((icon, index) => {
+            if (index === n) {
+                icon.className = dir === 'asc' ? 'bi bi-caret-up-fill small text-primary' : 'bi bi-caret-down-fill small text-primary';
+            } else if (index < 7) {
+                icon.className = 'bi bi-arrow-down-up small text-muted';
+            }
+        });
+    }
+
     function filtrarEgressos(valor) {
         const filtro = valor.toLowerCase();
         const linhas = document.querySelectorAll('#tabela-egressos tr');

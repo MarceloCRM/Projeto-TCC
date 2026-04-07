@@ -44,11 +44,11 @@
             <table class="table table-hover align-middle mb-0 small">
                 <thead class="table-light">
                     <tr>
-                        <th>Titulo</th>
-                        <th>Descricao</th>
-                        <th>Status</th>
-                        <th>Criado em</th>
-                        <th class="text-center">Acoes</th>
+                        <th onclick="sortTable(0)" style="cursor: pointer;">Título <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(1)" style="cursor: pointer;">Descrição <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(2)" style="cursor: pointer;">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(3)" style="cursor: pointer;">Criado em <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tabela-formularios">
@@ -87,4 +87,58 @@
         </div>
     </div>
 </div>
+
+<script>
+    let sortOrders = {};
+
+    function parseDate(dateStr) {
+        // Formato esperado: "dd/mm/aaaa hh:mm"
+        const parts = dateStr.split(/[\/\s:]/);
+        if (parts.length >= 5) {
+            return new Date(parts[2], parts[1] - 1, parts[0], parts[3], parts[4]);
+        }
+        return null;
+    }
+
+    function sortTable(n) {
+        const tableBody = document.getElementById("tabela-formularios");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        
+        // Verifica se há dados na tabela
+        if (rows.length === 1 && rows[0].cells.length === 1) return;
+
+        let dir = sortOrders[n] === "asc" ? "desc" : "asc";
+        sortOrders[n] = dir;
+
+        const sortedRows = rows.sort((a, b) => {
+            let x = a.cells[n].innerText.toLowerCase().trim();
+            let y = b.cells[n].innerText.toLowerCase().trim();
+
+            // Lógica para datas (coluna 3 - Criado em)
+            if (n === 3) {
+                let xDate = parseDate(x);
+                let yDate = parseDate(y);
+                if (xDate && yDate) {
+                    return dir === "asc" ? xDate - yDate : yDate - xDate;
+                }
+            }
+
+            // Fallback para comparação de string
+            return dir === "asc" ? x.localeCompare(y) : y.localeCompare(x);
+        });
+
+        tableBody.innerHTML = "";
+        sortedRows.forEach(row => tableBody.appendChild(row));
+
+        // Atualiza ícones
+        const icons = document.querySelectorAll('thead th i');
+        icons.forEach((icon, index) => {
+            if (index === n) {
+                icon.className = dir === 'asc' ? 'bi bi-caret-up-fill small text-primary' : 'bi bi-caret-down-fill small text-primary';
+            } else if (index < 4) {
+                icon.className = 'bi bi-arrow-down-up small text-muted';
+            }
+        });
+    }
+</script>
 {% endblock %}

@@ -115,7 +115,14 @@
 {% block content %}
 <div class="row g-4">
     <div class="col-lg-8">
-        <form id="filterForm" method="get"></form>
+        <form id="filterForm" method="get">
+            <input type="hidden" name="formulario_id" id="hidden_formulario_id" value="{{ formulario_id_get|default:'' }}">
+            <div id="hidden_canais_container">
+                {% for canal in canais_get %}
+                    <input type="hidden" name="canais" value="{{ canal }}">
+                {% endfor %}
+            </div>
+        </form>
 
         <form method="post" id="sendForm">
             {% csrf_token %}
@@ -128,10 +135,10 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <select name="formulario_id" class="form-select" required>
+                    <select name="formulario_id" id="id_formulario_select" class="form-select" required>
                         <option value="">Escolha um questionario...</option>
                         {% for f in formularios %}
-                            <option value="{{ f.pk }}">{{ f.titulo }}</option>
+                            <option value="{{ f.pk }}" {% if formulario_id_get == f.pk|stringformat:"s" %}selected{% endif %}>{{ f.titulo }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -148,7 +155,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3 d-flex align-items-center gap-3">
-                                <input type="checkbox" name="canais" value="whatsapp" class="form-check-input" style="width:1.2rem;height:1.2rem">
+                                <input type="checkbox" name="canais" value="whatsapp" class="form-check-input canal-checkbox" style="width:1.2rem;height:1.2rem" {% if 'whatsapp' in canais_get %}checked{% endif %}>
 
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
@@ -162,7 +169,7 @@
 
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3 d-flex align-items-center gap-3">
-                                <input type="checkbox" name="canais" value="email" class="form-check-input" style="width:1.2rem;height:1.2rem">
+                                <input type="checkbox" name="canais" value="email" class="form-check-input canal-checkbox" style="width:1.2rem;height:1.2rem" {% if 'email' in canais_get %}checked{% endif %}>
 
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
@@ -254,9 +261,9 @@
                                         Aplicar
                                     </button>
 
-                                    <a href="{% url 'envio:enviar_formulario' %}" class="btn btn-outline-secondary flex-fill">
+                                    <button type="button" onclick="clearFilters()" class="btn btn-outline-secondary flex-fill">
                                         Limpar
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -379,6 +386,46 @@
     function updateCount() {
         const count = document.querySelectorAll('.alumni-check:checked').length;
         document.getElementById('selected-count').textContent = count + ' selecionados';
+    }
+
+    // Sincronizar select de formulário com o campo hidden do filtro
+    const formularioSelect = document.getElementById('id_formulario_select');
+    const hiddenFormularioId = document.getElementById('hidden_formulario_id');
+
+    formularioSelect.addEventListener('change', function() {
+        hiddenFormularioId.value = this.value;
+    });
+
+    // Sincronizar checkboxes de canais com os campos hidden do filtro
+    const canalCheckboxes = document.querySelectorAll('.canal-checkbox');
+    const hiddenCanaisContainer = document.getElementById('hidden_canais_container');
+
+    canalCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            updateHiddenCanais();
+        });
+    });
+
+    function updateHiddenCanais() {
+        hiddenCanaisContainer.innerHTML = '';
+        canalCheckboxes.forEach(cb => {
+            if (cb.checked) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'canais';
+                hiddenInput.value = cb.value;
+                hiddenCanaisContainer.appendChild(hiddenInput);
+            }
+        });
+    }
+
+    function clearFilters() {
+        document.getElementById('filtro-busca').value = '';
+        document.getElementById('filtro-curso').value = '';
+        document.getElementById('filtro-ano').value = '';
+        document.getElementById('filtro-situacao').value = '';
+        document.getElementById('filtro-status').value = '';
+        document.getElementById('filterForm').submit();
     }
 
     syncSelectAll();
