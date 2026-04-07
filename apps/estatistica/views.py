@@ -132,3 +132,27 @@ def detalhe_formulario(request, formulario_id):
         'estatisticas_perguntas': estatisticas_perguntas,
     }
     return render(request, 'estatistica/detalhe_formulario.html', context)
+
+
+def listar_respostas_texto(request, formulario_id, pergunta_id):
+    formulario = get_object_or_404(Formulario, id=formulario_id)
+    pergunta = get_object_or_404(
+        Pergunta,
+        id=pergunta_id,
+        formulario=formulario,
+        tipo=Pergunta.TIPO_TEXTO,
+    )
+
+    respostas = (
+        Resposta.objects.filter(pergunta=pergunta)
+        .select_related('formulario_egresso__egresso')
+        .order_by('-respondido_em')
+    )
+
+    context = {
+        'formulario': formulario,
+        'pergunta': pergunta,
+        'respostas': respostas,
+        'total_respostas': respostas.count(),
+    }
+    return render(request, 'estatistica/listar_respostas_texto.html', context)

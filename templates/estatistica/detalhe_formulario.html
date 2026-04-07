@@ -370,7 +370,12 @@
                         {% elif item.pergunta.tipo == 'texto' %}
                         <!-- Lista de Respostas de Texto -->
                         <div class="bg-light p-3 rounded">
-                            <h6 class="fw-bold small mb-3">Últimas 5 respostas:</h6>
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                                <h6 class="fw-bold small mb-0">Últimas 5 respostas:</h6>
+                                <a href="{% url 'estatistica:listar_respostas_texto' formulario.id item.pergunta.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-list-ul me-1"></i> Ver todas as respostas
+                                </a>
+                            </div>
                             <ul class="list-group list-group-flush bg-transparent">
                                 {% for resp in item.stats.ultimas_respostas %}
                                 <li class="list-group-item bg-transparent px-0 py-2 small border-0">
