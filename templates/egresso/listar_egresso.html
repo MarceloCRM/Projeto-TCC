@@ -48,8 +48,8 @@
                     <tr>
                         <th onclick="sortTable(0)" style="cursor: pointer;">Nome <i class="bi bi-arrow-down-up small text-muted"></i></th>
                         <th onclick="sortTable(1)" style="cursor: pointer;">Curso <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th onclick="sortTable(2)" style="cursor: pointer;">Ano de conclusao <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th onclick="sortTable(3)" style="cursor: pointer;">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(2)" style="cursor: pointer;" class="text-center">Ano de conclusao <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(3)" style="cursor: pointer;" class="text-center">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
                         <th class="text-center">Acoes</th>
                     </tr>
                 </thead>
@@ -60,8 +60,8 @@
                             <tr>
                                 <td class="fw-bold">{{ eg.nome_completo }}</td>
                                 <td>{{ eg.curso }}</td>
-                                <td>{{ eg.ano_conclusao }}</td>
-                                <td>
+                                <td class="text-center">{{ eg.ano_conclusao }}</td>
+                                <td class="text-center">
                                     {% if eg.status == 'ativo' %}
                                         <span class="badge bg-success-subtle text-success border">Ativo</span>
                                     {% else %}

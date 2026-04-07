@@ -2,58 +2,153 @@
 
 {% block title %}Detalhes do Egresso | Acompanhamento de Egressos{% endblock %}
 
+{% block extra_css %}
+<style>
+    .egresso-hero {
+        background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+    }
+
+    .egresso-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .info-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #6c757d;
+        margin-bottom: 0.35rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #212529;
+        word-break: break-word;
+    }
+
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
     <div>
-        <h3 class="mb-1">{{ egresso.nome_completo }}</h3>
-        <p class="text-muted mb-0">Informacoes completas do egresso cadastrado.</p>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'egresso:listar_egresso' %}" class="text-decoration-none">Egressos</a></li>
+                <li class="breadcrumb-item active">Detalhes</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold mb-0">Detalhes do egresso</h2>
     </div>
 
     <div class="d-flex gap-2">
         <a href="{% url 'egresso:editar_egresso' egresso.id %}" class="btn btn-outline-secondary">
-            <i class="bi bi-pencil"></i> Editar
+            <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <a href="{% url 'egresso:listar_egresso' %}" class="btn btn-primary">
-            Voltar
+            <i class="bi bi-arrow-left me-1"></i> Voltar
         </a>
     </div>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <h5 class="mb-3">Dados pessoais</h5>
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Nome</dt>
-                    <dd class="col-sm-8">{{ egresso.nome_completo }}</dd>
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 egresso-hero">
+            <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="egresso-avatar">
+                            {{ egresso.nome_completo|slice:":1"|upper }}
+                        </div>
 
-                    <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8">{{ egresso.email }}</dd>
+                        <div>
+                            <small class="text-muted d-block mb-1">Cadastro de egresso</small>
+                            <h3 class="mb-1">{{ egresso.nome_completo }}</h3>
+                            <p class="text-muted mb-0">{{ egresso.curso }}</p>
+                        </div>
+                    </div>
 
-                    <dt class="col-sm-4">WhatsApp</dt>
-                    <dd class="col-sm-8">{{ egresso.whatsapp|default:"-" }}</dd>
-                </dl>
+                    <div class="text-md-end">
+                        <small class="text-muted d-block mb-2">Situacao atual</small>
+                        {% if egresso.status == 'ativo' %}
+                            <span class="badge bg-success-subtle text-success border px-3 py-2">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border px-3 py-2">Inativo</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 px-4 fw-bold">
+                Informacoes principais
             </div>
 
-            <div class="col-md-6">
-                <h5 class="mb-3">Dados academicos e profissionais</h5>
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Curso</dt>
-                    <dd class="col-sm-7">{{ egresso.curso }}</dd>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <span class="info-label">Nome completo</span>
+                        <div class="info-value">{{ egresso.nome_completo }}</div>
+                    </div>
 
-                    <dt class="col-sm-5">Ano de conclusao</dt>
-                    <dd class="col-sm-7">{{ egresso.ano_conclusao }}</dd>
+                    <div class="col-md-6">
+                        <span class="info-label">E-mail</span>
+                        <div class="info-value">{{ egresso.email }}</div>
+                    </div>
 
-                    <dt class="col-sm-5">Status</dt>
-                    <dd class="col-sm-7">
-                        {% if egresso.status == 'ativo' %}
-                            <span class="badge bg-success-subtle text-success border">Ativo</span>
-                        {% else %}
-                            <span class="badge bg-secondary-subtle text-secondary border">Inativo</span>
-                        {% endif %}
-                    </dd>
-                </dl>
+                    <div class="col-md-6">
+                        <span class="info-label">WhatsApp</span>
+                        <div class="info-value">{{ egresso.whatsapp|default:"-" }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <span class="info-label">Curso</span>
+                        <div class="info-value">{{ egresso.curso }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <span class="info-label">Ano de conclusao</span>
+                        <div class="info-value">{{ egresso.ano_conclusao }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 px-4 fw-bold">
+                Dados do cadastro
+            </div>
+
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <span class="info-label">Criado em</span>
+                    <div class="info-value">{{ egresso.criado_em|date:"d/m/Y H:i" }}</div>
+                </div>
+
+                <div class="mb-4">
+                    <span class="info-label">Ultima atualizacao</span>
+                    <div class="info-value">{{ egresso.atualizado_em|date:"d/m/Y H:i" }}</div>
+                </div>
+
+                <div class="rounded bg-light p-3 small text-muted">
+                    Este painel mostra apenas os dados atualmente mantidos no cadastro do egresso.
+                </div>
             </div>
         </div>
     </div>
