@@ -114,17 +114,17 @@
 
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="{% url 'index' %}" class="nav-link {% if request.resolver_match.view_name == 'index' %}active{% endif %}">
-                    <i class="bi bi-bar-chart"></i> Dashboard
+                <a href="{% url 'estatistica:index' %}" class="nav-link {% if request.resolver_match.view_name == 'estatistica:index' %}active{% endif %}">
+                    <i class="bi bi-bar-chart"></i> Relatório Geral
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{% url 'egresso:listar_egresso' %}" class="nav-link {% if request.resolver_match.url_name == 'listar_egresso' %}active{% endif %}">
+                <a href="{% url 'egresso:listar_egresso' %}" class="nav-link {% if request.resolver_match.app_name == 'egresso' %}active{% endif %}">
                     <i class="bi bi-people"></i> Egressos
                 </a>
             </li>
             <li>
-                <a href="{% url 'formularios:listar_formularios' %}" class="nav-link {% if request.resolver_match.url_name == 'listar_formularios' %}active{% endif %}">
+                <a href="{% url 'formularios:listar_formularios' %}" class="nav-link {% if request.resolver_match.app_name == 'formularios' %}active{% endif %}">
                     <i class="bi bi-file-earmark-text"></i> Formulários
                 </a>
             </li>
@@ -134,7 +134,7 @@
                 </a>
             </li>
             <li>
-                <a href="{% url 'estatistica:index' %}" class="nav-link {% if request.resolver_match.app_name == 'estatistica' %}active{% endif %}">
+                <a href="{% url 'estatistica:painel' %}" class="nav-link {% if request.resolver_match.app_name == 'estatistica' and request.resolver_match.url_name != 'index' %}active{% endif %}">
                     <i class="bi bi-graph-up"></i> Estatísticas
                 </a>
             </li>

@@ -16,11 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from apps.core.views import index
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
+    path('', RedirectView.as_view(pattern_name='estatistica:painel', permanent=False)),
     path("egresso/", include("apps.egresso.urls", namespace="egresso")),
     path('formularios/', include('apps.formularios.urls')),
     path('envio/', include('apps.envio.urls')),

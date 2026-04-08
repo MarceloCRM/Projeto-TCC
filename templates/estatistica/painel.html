@@ -1,0 +1,465 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Painel de Estatisticas | Acompanhamento de Egressos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-hero {
+        border: 0;
+        color: #fff;
+        background: linear-gradient(135deg, #0f172a, #2563eb);
+    }
+
+    .metric-card {
+        border: 0;
+        box-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+    }
+
+    .metric-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .chart-card,
+    .recent-card {
+        border: 0;
+        box-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+    }
+
+    .chart-wrapper {
+        position: relative;
+        min-height: 280px;
+    }
+
+    .chart-wrapper.chart-wrapper-sm {
+        min-height: 240px;
+    }
+
+    .empty-panel {
+        min-height: 240px;
+        border: 1px dashed #dbe2ea;
+        border-radius: 1rem;
+        background-color: #f8fafc;
+        color: #64748b;
+    }
+
+    .recent-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #dbeafe;
+        color: #1d4ed8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    @media (max-width: 767.98px) {
+        .chart-wrapper {
+            min-height: 240px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-4">
+    <div class="card dashboard-hero shadow-sm mb-4">
+        <div class="card-body p-4 p-lg-5">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'estatistica:index' %}" class="link-light link-opacity-75 text-decoration-none">Estatisticas</a>
+                            </li>
+                            <li class="breadcrumb-item active text-white-50" aria-current="page">Painel</li>
+                        </ol>
+                    </nav>
+                    <h2 class="fw-bold mb-2">Painel de acompanhamento</h2>
+                    <p class="mb-0 text-white-50">
+                        Visao consolidada dos envios, respostas e distribuicoes principais do sistema.
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'estatistica:painel' %}" class="btn btn-light">
+                        <i class="bi bi-bar-chart-line me-1"></i> Ver formularios
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted d-block mb-2">Total de egressos</small>
+                            <h3 class="fw-bold mb-0">{{ total_egressos }}</h3>
+                        </div>
+                        <span class="metric-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-people-fill"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted d-block mb-2">Questionarios ativos</small>
+                            <h3 class="fw-bold mb-0">{{ questionarios_ativos }}</h3>
+                        </div>
+                        <span class="metric-icon bg-success-subtle text-success">
+                            <i class="bi bi-file-earmark-check-fill"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted d-block mb-2">Links enviados</small>
+                            <h3 class="fw-bold mb-0">{{ links_enviados }}</h3>
+                        </div>
+                        <span class="metric-icon bg-info-subtle text-info">
+                            <i class="bi bi-send-fill"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted d-block mb-2">Questionarios respondidos</small>
+                            <h3 class="fw-bold mb-0">{{ questionarios_respondidos }}</h3>
+                        </div>
+                        <span class="metric-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-check2-circle"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted d-block mb-2">Taxa de resposta</small>
+                            <h3 class="fw-bold mb-0">{{ taxa_resposta|floatformat:-1 }}%</h3>
+                        </div>
+                        <span class="metric-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-percent"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted d-block mb-2">Respostas coletadas</small>
+                            <h3 class="fw-bold mb-0">{{ total_respostas }}</h3>
+                        </div>
+                        <span class="metric-icon bg-secondary-subtle text-secondary">
+                            <i class="bi bi-chat-left-text-fill"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card chart-card h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">Questionarios respondidos nos ultimos 30 dias</h5>
+                    <p class="text-muted small mb-0">Cada barra representa um envio concluido por data.</p>
+                </div>
+                <div class="card-body pt-3 px-4 pb-4">
+                    <div class="chart-wrapper">
+                        <canvas id="graficoRespostas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card chart-card h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">Engajamento dos envios</h5>
+                    <p class="text-muted small mb-0">Comparativo entre links respondidos e pendentes.</p>
+                </div>
+                <div class="card-body pt-3 px-4 pb-4">
+                    <div class="chart-wrapper chart-wrapper-sm">
+                        <canvas id="graficoEngajamento"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-5">
+            <div class="card chart-card h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">Egressos por curso</h5>
+                    <p class="text-muted small mb-0">Distribuicao dos cursos com maior volume de cadastros.</p>
+                </div>
+                <div class="card-body pt-3 px-4 pb-4">
+                    {% if possui_cursos %}
+                    <div class="chart-wrapper">
+                        <canvas id="graficoCursos"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="empty-panel d-flex flex-column align-items-center justify-content-center text-center p-4">
+                        <i class="bi bi-mortarboard fs-2 mb-2"></i>
+                        <p class="mb-0">Nenhum curso encontrado para gerar esse grafico.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-7">
+            <div class="card chart-card h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-1">Formularios com mais respostas</h5>
+                    <p class="text-muted small mb-0">Ranking dos questionarios mais respondidos.</p>
+                </div>
+                <div class="card-body pt-3 px-4 pb-4">
+                    {% if possui_ranking_formularios %}
+                    <div class="chart-wrapper">
+                        <canvas id="graficoFormularios"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="empty-panel d-flex flex-column align-items-center justify-content-center text-center p-4">
+                        <i class="bi bi-inbox fs-2 mb-2"></i>
+                        <p class="mb-0">Ainda nao ha respostas suficientes para montar o ranking.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card recent-card">
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+            <div>
+                <h5 class="fw-bold mb-1">Respostas recentes</h5>
+                <p class="text-muted small mb-0">Ultimos questionarios concluidos pelos egressos.</p>
+            </div>
+            <a href="{% url 'estatistica:painel' %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-right-circle me-1"></i> Explorar estatisticas por formulario
+            </a>
+        </div>
+        <div class="card-body px-0 pt-0">
+            {% if possui_respostas_recentes %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Egresso</th>
+                            <th>Formulario</th>
+                            <th>Curso</th>
+                            <th class="text-nowrap">Respondido em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resposta in respostas_recentes %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="recent-avatar">
+                                        {{ resposta.egresso.nome_completo|first|upper }}
+                                    </span>
+                                    <div>
+                                        <div class="fw-semibold">{{ resposta.egresso.nome_completo }}</div>
+                                        <div class="text-muted small">{{ resposta.egresso.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ resposta.formulario.titulo }}</td>
+                            <td>{{ resposta.egresso.curso }}</td>
+                            <td class="text-nowrap">{{ resposta.ultima_resposta_em|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-chat-left-dots fs-1 d-block mb-2"></i>
+                Nenhuma resposta registrada ate o momento.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const PALETA = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#0ea5e9', '#14b8a6', '#64748b'];
+
+    function criarGraficoLinhaBarra(elementoId, labels, dados) {
+        const elemento = document.getElementById(elementoId);
+        if (!elemento) {
+            return;
+        }
+
+        new Chart(elemento, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Questionarios respondidos',
+                    data: dados,
+                    backgroundColor: 'rgba(37, 99, 235, 0.75)',
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function criarGraficoRosca(elementoId, labels, dados) {
+        const elemento = document.getElementById(elementoId);
+        if (!elemento) {
+            return;
+        }
+
+        new Chart(elemento, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dados,
+                    backgroundColor: ['#2563eb', '#cbd5e1'],
+                    borderColor: '#ffffff',
+                    borderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '68%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function criarGraficoHorizontal(elementoId, labels, dados, rotulo) {
+        const elemento = document.getElementById(elementoId);
+        if (!elemento) {
+            return;
+        }
+
+        new Chart(elemento, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: rotulo,
+                    data: dados,
+                    backgroundColor: PALETA,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    criarGraficoLinhaBarra(
+        'graficoRespostas',
+        {{ labels_respostas|safe }},
+        {{ dados_respostas|safe }}
+    );
+
+    criarGraficoRosca(
+        'graficoEngajamento',
+        {{ labels_engajamento|safe }},
+        {{ dados_engajamento|safe }}
+    );
+
+    criarGraficoHorizontal(
+        'graficoCursos',
+        {{ labels_cursos|safe }},
+        {{ dados_cursos|safe }},
+        'Egressos'
+    );
+
+    criarGraficoHorizontal(
+        'graficoFormularios',
+        {{ labels_formularios|safe }},
+        {{ dados_formularios|safe }},
+        'Respostas'
+    );
+</script>
+{% endblock %}

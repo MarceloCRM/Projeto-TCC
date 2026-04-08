@@ -1,11 +1,81 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Formulário enviado</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Obrigado! | UniEgressos</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Sora:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue-900:#1e3a8a;
+      --blue-700:#1d4ed8;
+      --blue-500:#3b82f6;
+      --blue-200:#bfdbfe;
+      --blue-50:#eff6ff;
+    }
+
+    body{
+      font-family:'Sora',sans-serif;
+      background:var(--blue-50);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:0;
+    }
+
+    .caixa{
+      background:#fff;
+      border-radius:20px;
+      padding:3rem 2.5rem;
+      text-align:center;
+      max-width:440px;
+      box-shadow:0 12px 40px rgba(30,58,138,.12);
+    }
+
+    .icone{
+      width:80px;
+      height:80px;
+      border-radius:50%;
+      background:var(--blue-200);
+      color:var(--blue-700);
+      font-size:2.4rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto 1.5rem;
+    }
+
+    h2{
+      font-family:'Playfair Display',serif;
+      font-size:1.7rem;
+      color:var(--blue-900);
+      margin-bottom:.5rem;
+    }
+
+    p{
+      color:#6b7280;
+      font-size:.9rem;
+      line-height:1.6;
+    }
+  </style>
 </head>
+
 <body>
-    <h1>Obrigado!</h1>
-    <p>Suas respostas foram enviadas com sucesso.</p>
+
+<div class="caixa">
+  <div class="icone">✓</div>
+
+  <h2>Obrigado pela sua resposta!</h2>
+
+  <p>
+    Suas respostas foram registradas com sucesso.
+    Sua contribuição é fundamental para melhorarmos
+    continuamente nossos programas acadêmicos.
+  </p>
+</div>
+
 </body>
 </html>
