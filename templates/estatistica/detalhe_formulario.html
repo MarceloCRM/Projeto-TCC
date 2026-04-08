@@ -266,7 +266,7 @@
                                         <span class="small text-muted">{{ op.quantidade }} ({{ op.percentual }}%)</span>
                                     </div>
                                     <div class="progress" style="height: 10px;">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ op.percentual }}%" aria-valuenow="{{ op.percentual }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" style="width: {{ op.percentual_css }}%" aria-valuenow="{{ op.percentual }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -280,7 +280,7 @@
                                             <span class="choice-chart-value">{{ op.quantidade }}</span>
                                             <div class="choice-chart-bar-wrap" aria-hidden="true">
                                                 <div class="choice-chart-bar-track">
-                                                    <div class="choice-chart-bar" style="height: {{ op.percentual }}%;"></div>
+                                                    <div class="choice-chart-bar" style="height: {{ op.percentual_css }}%;"></div>
                                                 </div>
                                             </div>
                                             <span class="choice-chart-label">
@@ -314,7 +314,7 @@
                                     <div class="col-12 d-flex align-items-center gap-2 mb-1 scale-row">
                                         <div class="small fw-bold" style="width: 46px;">Nota {{ nota }}</div>
                                         <div class="progress flex-grow-1" style="height: 8px;">
-                                            <div class="progress-bar" role="progressbar" style="width: {{ data.percentual }}%"></div>
+                                            <div class="progress-bar" role="progressbar" style="width: {{ data.percentual_css }}%"></div>
                                         </div>
                                         <div class="small text-muted" style="width: 38px;">{{ data.percentual }}%</div>
                                     </div>
@@ -330,7 +330,7 @@
                                                 <span class="choice-chart-value">{{ data.quantidade }}</span>
                                                 <div class="choice-chart-bar-wrap" aria-hidden="true">
                                                     <div class="choice-chart-bar-track">
-                                                        <div class="choice-chart-bar" style="height: {{ data.percentual }}%;"></div>
+                                                        <div class="choice-chart-bar" style="height: {{ data.percentual_css }}%;"></div>
                                                     </div>
                                                 </div>
                                                 <span class="choice-chart-label">

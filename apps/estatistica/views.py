@@ -16,6 +16,10 @@ def _calcular_percentual(parte, total):
     return round((parte / total) * 100, 1)
 
 
+def _formatar_percentual_css(valor):
+    return f'{valor:.1f}'.rstrip('0').rstrip('.')
+
+
 def index(request):
     hoje = timezone.localdate()
     inicio_periodo = hoje - timedelta(days=29)
@@ -190,10 +194,12 @@ def detalhe_formulario(request, formulario_id):
                 for opcao in opcoes:
                     count = respostas_qs.filter(valor=opcao.texto).count()
                     percentual = (count / dados_pergunta['total_respostas_pergunta'] * 100) if dados_pergunta['total_respostas_pergunta'] > 0 else 0
+                    percentual = round(percentual, 1)
                     distribuicao.append({
                         'texto': opcao.texto,
                         'quantidade': count,
-                        'percentual': round(percentual, 1)
+                        'percentual': percentual,
+                        'percentual_css': _formatar_percentual_css(percentual),
                     })
                 dados_pergunta['stats']['distribuicao'] = distribuicao
                 
@@ -205,10 +211,11 @@ def detalhe_formulario(request, formulario_id):
                     distribuicao = {}
                     for i in range(1, 6):
                         count = valores.count(i)
-                        percentual = (count / len(valores) * 100)
+                        percentual = round((count / len(valores) * 100), 1)
                         distribuicao[i] = {
                             'quantidade': count,
-                            'percentual': round(percentual, 1)
+                            'percentual': percentual,
+                            'percentual_css': _formatar_percentual_css(percentual),
                         }
                     dados_pergunta['stats']['distribuicao'] = distribuicao
 

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.egresso.models import Egresso
-from apps.formularios.models import Formulario, FormularioEgresso, Pergunta, Resposta
+from apps.formularios.models import Formulario, FormularioEgresso, Opcao, Pergunta, Resposta
 
 
 class PainelEstatisticaTests(TestCase):
@@ -109,3 +109,72 @@ class PainelEstatisticaTests(TestCase):
         self.assertEqual(sum(dados_respostas), 1)
         self.assertEqual(sum(dados_cursos), 2)
         self.assertEqual(dados_formularios, [1])
+
+
+class DetalheFormularioEstatisticaTests(TestCase):
+    def test_detalhe_formulario_usa_percentual_css_com_ponto_nos_graficos(self):
+        formulario = Formulario.objects.create(
+            titulo='Pesquisa de Satisfacao',
+            descricao='Detalhes do formulario',
+            status=Formulario.STATUS_ATIVO,
+        )
+        pergunta_escolha = Pergunta.objects.create(
+            formulario=formulario,
+            texto='Qual area voce atua?',
+            tipo=Pergunta.TIPO_ESCOLHA,
+            ordem=1,
+        )
+        pergunta_escala = Pergunta.objects.create(
+            formulario=formulario,
+            texto='Como voce avalia o curso?',
+            tipo=Pergunta.TIPO_ESCALA,
+            ordem=2,
+        )
+
+        opcao_ti = Opcao.objects.create(pergunta=pergunta_escolha, texto='TI')
+        Opcao.objects.create(pergunta=pergunta_escolha, texto='Educacao')
+
+        respostas_escolha = ['TI', 'Educacao', 'Educacao']
+        respostas_escala = ['5', '4', '4']
+
+        for indice in range(3):
+            egresso = Egresso.objects.create(
+                nome_completo=f'Egresso {indice}',
+                email=f'egresso{indice}@example.com',
+                whatsapp=f'1199999999{indice}',
+                curso='Sistemas de Informacao',
+                ano_conclusao=2020 + indice,
+                status=Egresso.STATUS_ATIVO,
+            )
+            link = FormularioEgresso.objects.create(
+                formulario=formulario,
+                egresso=egresso,
+                utilizado=True,
+            )
+            Resposta.objects.create(
+                formulario_egresso=link,
+                pergunta=pergunta_escolha,
+                valor=respostas_escolha[indice],
+                respondido_em=timezone.now(),
+            )
+            Resposta.objects.create(
+                formulario_egresso=link,
+                pergunta=pergunta_escala,
+                valor=respostas_escala[indice],
+                respondido_em=timezone.now(),
+            )
+
+        response = self.client.get(reverse('estatistica:detalhe_formulario', args=[formulario.id]))
+
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode('utf-8')
+        self.assertIn('style="width: 33.3%"', html)
+        self.assertIn('style="height: 33.3%;"', html)
+        self.assertEqual(
+            response.context['estatisticas_perguntas'][0]['stats']['distribuicao'][0]['percentual_css'],
+            '33.3',
+        )
+        self.assertEqual(
+            response.context['estatisticas_perguntas'][0]['stats']['distribuicao'][0]['texto'],
+            opcao_ti.texto,
+        )
