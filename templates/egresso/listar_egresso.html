@@ -2,6 +2,34 @@
 
 {% block title %}Egressos | Acompanhamento de Egressos{% endblock %}
 
+{% block extra_css %}
+<style>
+    .egressos-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .egressos-nome-col {
+        width: 30%;
+    }
+
+    .egressos-curso-col {
+        width: 26%;
+    }
+
+    .egressos-table th,
+    .egressos-table td {
+        vertical-align: middle;
+    }
+
+    .egressos-table .egressos-nome-col,
+    .egressos-table .egressos-curso-col {
+        white-space: normal;
+        word-break: break-word;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
     <h3>Egressos</h3>
@@ -24,7 +52,11 @@
             </div>
 
             <div class="col-md-2">
-                {{ form_filtro.status }}
+                    <select name="status" class="form-select">
+                        <option value="">Todos os Status</option>
+                        <option value="ativo" {% if request.GET.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                        <option value="inativo" {% if request.GET.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                    </select>
             </div>
 
             <div class="col-md-2 d-flex gap-2">
@@ -43,14 +75,14 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 small">
+            <table class="table table-hover align-middle mb-0 small egressos-table">
                 <thead class="table-light">
                     <tr>
-                        <th onclick="sortTable(0)" style="cursor: pointer;">Nome <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th onclick="sortTable(1)" style="cursor: pointer;">Curso <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th onclick="sortTable(2)" style="cursor: pointer;" class="text-center">Ano de conclusao <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(0)" style="cursor: pointer;" class="egressos-nome-col">Nome <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(1)" style="cursor: pointer;" class="egressos-curso-col">Curso <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(2)" style="cursor: pointer;" class="text-center">Ano de conclusão <i class="bi bi-arrow-down-up small text-muted"></i></th>
                         <th onclick="sortTable(3)" style="cursor: pointer;" class="text-center">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                        <th class="text-center">Acoes</th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
 
@@ -58,8 +90,8 @@
                     {% if egressos %}
                         {% for eg in egressos %}
                             <tr>
-                                <td class="fw-bold">{{ eg.nome_completo }}</td>
-                                <td>{{ eg.curso }}</td>
+                                <td class="fw-bold egressos-nome-col">{{ eg.nome_completo }}</td>
+                                <td class="egressos-curso-col">{{ eg.curso }}</td>
                                 <td class="text-center">{{ eg.ano_conclusao }}</td>
                                 <td class="text-center">
                                     {% if eg.status == 'ativo' %}

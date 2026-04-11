@@ -114,7 +114,7 @@
 
 {% block content %}
 <div class="row g-4">
-    <div class="col-lg-8">
+    <div class="col-lg-9">
         <form id="filterForm" method="get">
             <input type="hidden" name="formulario_id" id="hidden_formulario_id" value="{{ formulario_id_get|default:'' }}">
             <div id="hidden_canais_container">
@@ -130,13 +130,13 @@
             <div class="card mb-4">
                 <div class="card-header py-3 px-4">
                     <span class="fw-semibold">
-                        <span class="badge bg-primary me-2">1</span>Selecionar Questionario
+                        <span class="badge bg-primary me-2">1</span>Selecionar Questionário
                     </span>
                 </div>
 
                 <div class="card-body p-4">
                     <select name="formulario_id" id="id_formulario_select" class="form-select" required>
-                        <option value="">Escolha um questionario...</option>
+                        <option value="">Escolha um questionário...</option>
                         {% for f in formularios %}
                             <option value="{{ f.pk }}" {% if formulario_id_get == f.pk|stringformat:"s" %}selected{% endif %}>{{ f.titulo }}</option>
                         {% endfor %}
@@ -162,7 +162,6 @@
                                         <i class="bi bi-whatsapp text-success fs-5"></i>
                                         <strong>WhatsApp</strong>
                                     </div>
-                                    <small class="text-muted">Envio via Twilio</small>
                                 </div>
                             </div>
                         </div>
@@ -176,7 +175,6 @@
                                         <i class="bi bi-envelope-fill text-primary fs-5"></i>
                                         <strong>Email</strong>
                                     </div>
-                                    <small class="text-muted">Envio via SendGrid</small>
                                 </div>
                             </div>
                         </div>
@@ -198,20 +196,20 @@
                 <div class="card-body p-0">
                     <div class="p-4 border-bottom filter-panel">
                         <div class="row g-3 align-items-end">
-                            <div class="col-md-7">
-                                <label for="filtro-busca" class="filter-label">Busca</label>
+                            <div class="col-md-4">
+                                <label for="filtro-busca" class="filter-label">Buscar egresso</label>
                                 <input
                                     id="filtro-busca"
                                     form="filterForm"
                                     type="text"
                                     name="busca"
                                     class="form-control"
-                                    placeholder="Nome ou email"
+                                    placeholder="Digite nome ou e-mail"
                                     value="{{ request.GET.busca|default:'' }}"
                                 >
                             </div>
 
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 <label for="filtro-curso" class="filter-label">Curso</label>
                                 <input
                                     id="filtro-curso"
@@ -219,33 +217,24 @@
                                     type="text"
                                     name="curso"
                                     class="form-control"
-                                    placeholder="Curso"
+                                    placeholder="Digite o nome do curso"
                                     value="{{ request.GET.curso|default:'' }}"
                                 >
                             </div>
                             <div class="col-md-2">
-                                <label for="filtro-ano" class="filter-label">Ano</label>
+                                <label for="filtro-ano" class="filter-label">Ano de Conclusão</label>
                                 <input
                                     id="filtro-ano"
                                     form="filterForm"
                                     type="number"
                                     name="ano_conclusao"
                                     class="form-control"
-                                    placeholder="Ano"
+                                    placeholder="Ex: 2023"
                                     value="{{ request.GET.ano_conclusao|default:'' }}"
                                 >
                             </div>
 
-                            <div class="col-md-3">
-                                <label for="filtro-status" class="filter-label">Status</label>
-                                <select id="filtro-status" form="filterForm" name="status" class="form-select">
-                                    {% for value, label in form_filtro.fields.status.choices %}
-                                        <option value="{{ value }}" {% if request.GET.status == value|default:'' %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
+                            <div class="col-12 col-lg-3">
                                 <div class="filter-actions">
                                     <button type="submit" form="filterForm" class="btn btn-outline-primary flex-fill">
                                         <i class="bi bi-funnel me-1"></i>
@@ -317,13 +306,13 @@
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="bi bi-send-fill me-2"></i>
-                    Enviar Questionario
+                    Enviar Questionário
                 </button>
             </div>
         </form>
     </div>
 
-    <div class="col-lg-4">
+    <div class="col-lg-3" style="text-align: justify;">
         <div class="card sticky-top" style="top:24px">
             <div class="card-header py-3 px-4">
                 <i class="bi bi-info-circle me-2 text-primary"></i>
@@ -332,7 +321,7 @@
 
             <div class="card-body p-4">
                 <p class="text-muted small">
-                    Selecione um questionario, escolha os canais de envio e marque os egressos que irao receber o link para responder.
+                    Selecione um questionário, escolha os canais de envio e marque os egressos que irão receber o link para responder.
                 </p>
             </div>
         </div>

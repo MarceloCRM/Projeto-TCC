@@ -4,7 +4,7 @@ from . import views
 app_name = 'estatistica'
 
 urlpatterns = [
-    path('painel/', views.painel, name='painel'),
+    path('lista_formularios/', views.lista_formularios, name='lista_formularios'),
     path('', views.index, name='index'),
     path('<int:formulario_id>/', views.detalhe_formulario, name='detalhe_formulario'),
     path(

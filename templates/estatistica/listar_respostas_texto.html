@@ -7,7 +7,7 @@
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="{% url 'estatistica:painel' %}" class="text-decoration-none">Estatisticas</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'estatistica:lista_formularios' %}" class="text-decoration-none">Estatisticas</a></li>
                 <li class="breadcrumb-item"><a href="{% url 'estatistica:detalhe_formulario' formulario.id %}" class="text-decoration-none">{{ formulario.titulo|truncatechars:30 }}</a></li>
                 <li class="breadcrumb-item active">Respostas</li>
             </ol>

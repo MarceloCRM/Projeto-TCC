@@ -134,7 +134,7 @@
                 </a>
             </li>
             <li>
-                <a href="{% url 'estatistica:painel' %}" class="nav-link {% if request.resolver_match.app_name == 'estatistica' and request.resolver_match.url_name != 'index' %}active{% endif %}">
+                <a href="{% url 'estatistica:lista_formularios' %}" class="nav-link {% if request.resolver_match.app_name == 'estatistica' and request.resolver_match.url_name != 'index' %}active{% endif %}">
                     <i class="bi bi-graph-up"></i> Estatísticas
                 </a>
             </li>

@@ -80,7 +80,7 @@
                     </div>
 
                     <div class="text-md-end">
-                        <small class="text-muted d-block mb-2">Situacao atual</small>
+                        <small class="text-muted d-block mb-2">Situação atual</small>
                         {% if egresso.status == 'ativo' %}
                             <span class="badge bg-success-subtle text-success border px-3 py-2">Ativo</span>
                         {% else %}
@@ -95,7 +95,7 @@
     <div class="col-lg-8">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-white py-3 px-4 fw-bold">
-                Informacoes principais
+                Informações principais
             </div>
 
             <div class="card-body p-4">
@@ -111,7 +111,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <span class="info-label">WhatsApp</span>
+                        <span class="info-label">Número de WhatsApp</span>
                         <div class="info-value">{{ egresso.whatsapp|default:"-" }}</div>
                     </div>
 
@@ -121,7 +121,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <span class="info-label">Ano de conclusao</span>
+                        <span class="info-label">Ano de conclusão</span>
                         <div class="info-value">{{ egresso.ano_conclusao }}</div>
                     </div>
                 </div>
@@ -142,7 +142,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <span class="info-label">Ultima atualizacao</span>
+                    <span class="info-label">Ultima atualização</span>
                     <div class="info-value">{{ egresso.atualizado_em|date:"d/m/Y H:i" }}</div>
                 </div>
 

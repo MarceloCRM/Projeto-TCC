@@ -67,7 +67,7 @@ class EgressoFiltroForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Buscar por nome'
+            'placeholder': 'Digite o nome do egresso'
         })
     )
 
@@ -75,7 +75,7 @@ class EgressoFiltroForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Curso'
+            'placeholder': 'Digite o nome do curso'
         })
     )
 
