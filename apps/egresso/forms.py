@@ -7,11 +7,12 @@ from .models import Egresso
 
 
 class EgressoForm(forms.ModelForm):
-    curso_nome = forms.CharField(
+    curso = forms.ModelChoiceField(
+        queryset=Curso.objects.none(),
         label='Curso',
-        widget=TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Curso'
+        empty_label='Selecione um curso',
+        widget=Select(attrs={
+            'class': 'form-select'
         })
     )
 
@@ -21,6 +22,7 @@ class EgressoForm(forms.ModelForm):
             'nome_completo',
             'email',
             'whatsapp',
+            'curso',
             'ano_conclusao',
             'status',
         ]
@@ -37,6 +39,9 @@ class EgressoForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'WhatsApp'
             }),
+            'curso': Select(attrs={
+                'class': 'form-select'
+            }),
             'ano_conclusao': NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ano de Conclusao'
@@ -49,23 +54,14 @@ class EgressoForm(forms.ModelForm):
             'nome_completo': 'Nome Completo',
             'email': 'Email',
             'whatsapp': 'WhatsApp',
+            'curso': 'Curso',
             'ano_conclusao': 'Ano de Conclusao',
             'status': 'Status',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if self.instance.pk and self.instance.curso_id:
-            self.fields['curso_nome'].initial = self.instance.curso.nome
-
-    def clean_curso_nome(self):
-        curso_nome = ' '.join((self.cleaned_data.get('curso_nome') or '').split())
-
-        if not curso_nome:
-            raise forms.ValidationError('Informe o curso.')
-
-        return curso_nome
+        self.fields['curso'].queryset = Curso.objects.order_by('nome')
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -78,21 +74,6 @@ class EgressoForm(forms.ModelForm):
             raise forms.ValidationError('Este e-mail ja esta cadastrado.')
 
         return email
-
-    def save(self, commit=True):
-        curso_nome = self.cleaned_data['curso_nome']
-        curso = Curso.objects.filter(nome__iexact=curso_nome).first()
-
-        if curso is None:
-            curso = Curso.objects.create(nome=curso_nome)
-
-        egresso = super().save(commit=False)
-        egresso.curso = curso
-
-        if commit:
-            egresso.save()
-
-        return egresso
 
 
 class EgressoFiltroForm(forms.Form):

@@ -7,7 +7,7 @@
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="{% url 'estatistica:lista_formularios' %}" class="text-decoration-none">Estatisticas</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'estatistica:lista_formularios' %}" class="text-decoration-none">Estatísticas</a></li>
                 <li class="breadcrumb-item"><a href="{% url 'estatistica:detalhe_formulario' formulario.id %}" class="text-decoration-none">{{ formulario.titulo|truncatechars:30 }}</a></li>
                 <li class="breadcrumb-item active">Respostas</li>
             </ol>
@@ -25,7 +25,7 @@
     <div class="col-md-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
-                <small class="text-muted d-block mb-1">Formulario</small>
+                <small class="text-muted d-block mb-1">Formulário</small>
                 <div class="fw-semibold">{{ formulario.titulo }}</div>
             </div>
         </div>

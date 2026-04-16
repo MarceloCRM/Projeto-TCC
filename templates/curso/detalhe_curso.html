@@ -79,7 +79,7 @@
                     </div>
 
                     <div class="text-md-end">
-                        <small class="text-muted d-block mb-2">Situacao atual</small>
+                        <small class="text-muted d-block mb-2">Situação atual</small>
                         {% if curso.status == 'ativo' %}
                             <span class="badge bg-success-subtle text-success border px-3 py-2">Ativo</span>
                         {% else %}
@@ -94,7 +94,7 @@
     <div class="col-lg-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-white py-3 px-4 fw-bold">
-                Informacoes principais
+                Informações principais
             </div>
 
             <div class="card-body p-4">
@@ -119,7 +119,7 @@
                 </div>
 
                 <div>
-                    <span class="info-label">Ultima atualizacao</span>
+                    <span class="info-label">Última atualização</span>
                     <div class="info-value">{{ curso.atualizado_em|date:"d/m/Y H:i" }}</div>
                 </div>
             </div>
@@ -140,9 +140,9 @@
                                 <tr>
                                     <th class="ps-4">Nome</th>
                                     <th>E-mail</th>
-                                    <th class="text-center">Ano de conclusao</th>
+                                    <th class="text-center">Ano de conclusão</th>
                                     <th class="text-center">Status</th>
-                                    <th class="text-center">Acoes</th>
+                                    <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -172,7 +172,7 @@
                     </div>
                 {% else %}
                     <div class="p-4 text-muted">
-                        Nenhum egresso esta vinculado a este curso no momento.
+                        Nenhum egresso está vinculado a este curso no momento.
                     </div>
                 {% endif %}
             </div>

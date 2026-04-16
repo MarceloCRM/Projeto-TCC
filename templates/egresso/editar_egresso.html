@@ -35,9 +35,9 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Curso <span class="text-danger">*</span></label>
-                        {{ form.curso_nome }}
-                        {% if form.curso_nome.errors %}
-                            <div class="text-danger small mt-1">{{ form.curso_nome.errors.0 }}</div>
+                        {{ form.curso }}
+                        {% if form.curso.errors %}
+                            <div class="text-danger small mt-1">{{ form.curso.errors.0 }}</div>
                         {% endif %}
                     </div>
 

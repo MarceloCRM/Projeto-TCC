@@ -180,7 +180,6 @@
 
 {% block content %}
 <div class="container-fluid pb-5">
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'estatistica:lista_formularios' %}" class="text-decoration-none">Estatísticas</a></li>
@@ -188,7 +187,6 @@
         </ol>
     </nav>
 
-    <!-- Header Section -->
     <div class="row align-items-center mb-4">
         <div class="col-md-8">
             <h2 class="fw-bold mb-1">{{ formulario.titulo }}</h2>
@@ -197,12 +195,11 @@
     </div>
 
     {% if total_respostas > 0 %}
-    <!-- Summary Cards (Section A) -->
     <div class="row g-3 mb-5">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <small class="text-muted d-block mb-1">Total de Respostas</small>
+                    <small class="text-muted d-block mb-1">Total de respostas</small>
                     <h3 class="fw-bold mb-0">{{ total_respostas }}</h3>
                 </div>
             </div>
@@ -210,7 +207,7 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <small class="text-muted d-block mb-1">Total de Perguntas</small>
+                    <small class="text-muted d-block mb-1">Total de perguntas</small>
                     <h3 class="fw-bold mb-0">{{ total_perguntas }}</h3>
                 </div>
             </div>
@@ -218,7 +215,7 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <small class="text-muted d-block mb-1">Obrigatórias / Opcionais</small>
+                    <small class="text-muted d-block mb-1">Obrigatórias / opcionais</small>
                     <h3 class="fw-bold mb-0 text-primary">{{ perguntas_obrigatorias }} <span class="text-muted fs-6 fw-normal">/ {{ perguntas_opcionais }}</span></h3>
                 </div>
             </div>
@@ -226,17 +223,16 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <small class="text-muted d-block mb-1">Última Resposta</small>
+                    <small class="text-muted d-block mb-1">Última resposta</small>
                     <h6 class="fw-bold mb-0 mt-1">{{ ultima_resposta.respondido_em|date:"d/m/Y H:i" }}</h6>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Question-by-question Statistics (Section B) -->
     <div class="row g-4">
         <div class="col-12">
-            <h4 class="fw-bold mb-4">Análise por Pergunta</h4>
+            <h4 class="fw-bold mb-4">Análise por pergunta</h4>
         </div>
 
         {% for item in estatisticas_perguntas %}
@@ -249,14 +245,13 @@
                     </div>
                     <span class="badge bg-light text-muted fw-normal">{{ item.pergunta.get_tipo_display }}</span>
                 </div>
-                
+
                 <div class="card-body pt-0">
                     <div class="text-muted small mb-3">Total de respostas para esta pergunta: <strong>{{ item.total_respostas_pergunta }}</strong></div>
-                    
+
                     {% if item.tem_respostas %}
-                        
+
                         {% if item.pergunta.tipo == 'escolha' %}
-                        <!-- Estatística de Múltipla Escolha -->
                         <div class="row g-4 align-items-center choice-stats">
                             <div class="col-md-7">
                                 {% for op in item.stats.distribuicao %}
@@ -295,7 +290,6 @@
                         </div>
 
                         {% elif item.pergunta.tipo == 'escala' %}
-                        <!-- Estatística de Escala 1 a 5 -->
                         <div class="row align-items-center scale-stats">
                             <div class="col-md-3 text-center border-end">
                                 <h1 class="display-3 fw-bold text-primary mb-0">{{ item.stats.media }}</h1>
@@ -306,7 +300,7 @@
                                     {% endfor %}
                                     {% endwith %}
                                 </div>
-                                <p class="text-muted small mt-1">Média de Avaliação</p>
+                                <p class="text-muted small mt-1">Média de avaliação</p>
                             </div>
                             <div class="col-md-4 ps-md-3">
                                 <div class="row g-2">
@@ -322,9 +316,9 @@
                                 </div>
                             </div>
                             <div class="col-md-5 mt-4 mt-md-0 scale-vertical-chart">
-                                <div class="choice-chart" role="img" aria-label="GrÃ¡fico de barras verticais com a distribuiÃ§Ã£o das notas da pergunta {{ item.pergunta.texto }}">
+                                <div class="choice-chart" role="img" aria-label="Gráfico de barras verticais com a distribuição das notas da pergunta {{ item.pergunta.texto }}">
                                     <div class="choice-chart-scroll">
-                                        <div class="choice-chart-bars" role="list" aria-label="DistribuiÃ§Ã£o das notas de 1 a 5">
+                                        <div class="choice-chart-bars" role="list" aria-label="Distribuição das notas de 1 a 5">
                                             {% for nota, data in item.stats.distribuicao.items %}
                                             <div class="choice-chart-bar-item" role="listitem" aria-label="Nota {{ nota }}: {{ data.quantidade }} respostas, {{ data.percentual }} por cento">
                                                 <span class="choice-chart-value">{{ data.quantidade }}</span>
@@ -345,7 +339,6 @@
                         </div>
 
                         {% elif item.pergunta.tipo == 'numero' %}
-                        <!-- Estatística Numérica -->
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <div class="p-3 bg-light rounded text-center">
@@ -368,7 +361,6 @@
                         </div>
 
                         {% elif item.pergunta.tipo == 'texto' %}
-                        <!-- Lista de Respostas de Texto -->
                         <div class="bg-light p-3 rounded">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
                                 <h6 class="fw-bold small mb-0">Últimas 5 respostas:</h6>
@@ -387,7 +379,6 @@
                         {% endif %}
 
                     {% else %}
-                        <!-- Empty state para pergunta sem resposta -->
                         <div class="text-center py-3 bg-light rounded border border-dashed">
                             <p class="text-muted small mb-0">Esta pergunta ainda não possui respostas.</p>
                         </div>
@@ -399,7 +390,6 @@
     </div>
 
     {% else %}
-    <!-- Empty state para formulário sem nenhuma resposta -->
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm py-5">

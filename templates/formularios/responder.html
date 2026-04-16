@@ -438,7 +438,7 @@
             {{ op.texto }}
           </label>
           {% empty %}
-          <p style="color:#94a3b8;font-size:.82rem"><em>Nenhuma opcao cadastrada.</em></p>
+          <p style="color:#94a3b8;font-size:.82rem"><em>Nenhuma opção cadastrada.</em></p>
           {% endfor %}
         </div>
 
@@ -457,7 +457,7 @@
             {% endfor %}
           </div>
           <div class="escala-legenda">
-            <span>Pessimo</span><span>Excelente</span>
+            <span>Péssimo</span><span>Excelente</span>
           </div>
         </div>
 
@@ -477,7 +477,7 @@
                  name="pergunta_{{ pergunta.pk }}"
                  class="input-numerico resposta-input"
                  data-pergunta="{{ pergunta.pk }}"
-                 placeholder="Digite um numero..."
+                 placeholder="Digite um número..."
                  {% if pergunta.obrigatoria %}required{% endif %}>
         </div>
       {% endif %}
@@ -489,7 +489,7 @@
     </button>
 
     <p class="rodape-nota">
-      <i class="bi bi-shield-lock me-1"></i>Suas respostas sao confidenciais e usadas apenas para fins academicos.
+      <i class="bi bi-shield-lock me-1"></i>Suas respostas são confidenciais e usadas apenas para fins acadêmicos.
     </p>
   </form>
 </div>

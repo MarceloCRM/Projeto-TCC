@@ -130,7 +130,7 @@
             <div class="card mb-4">
                 <div class="card-header py-3 px-4">
                     <span class="fw-semibold">
-                        <span class="badge bg-primary me-2">1</span>Selecionar Questionário
+                        <span class="badge bg-primary me-2">1</span>Selecionar questionário
                     </span>
                 </div>
 
@@ -173,7 +173,7 @@
                                 <div>
                                     <div class="d-flex align-items-center gap-2">
                                         <i class="bi bi-envelope-fill text-primary fs-5"></i>
-                                        <strong>Email</strong>
+                                        <strong>E-mail</strong>
                                     </div>
                                 </div>
                             </div>
@@ -185,7 +185,7 @@
             <div class="card mb-4">
                 <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center">
                     <span class="fw-semibold">
-                        <span class="badge bg-primary me-2">3</span>Selecionar Egressos
+                        <span class="badge bg-primary me-2">3</span>Selecionar egressos
                     </span>
 
                     <span class="badge bg-secondary" id="selected-count">
@@ -222,7 +222,7 @@
                                 >
                             </div>
                             <div class="col-md-2">
-                                <label for="filtro-ano" class="filter-label">Ano de Conclusão</label>
+                                <label for="filtro-ano" class="filter-label">Ano de conclusão</label>
                                 <input
                                     id="filtro-ano"
                                     form="filterForm"
@@ -287,7 +287,7 @@
                                                    title="WhatsApp: {{ egresso.whatsapp }}"></i>
                                             {% endif %}
                                             <i class="bi bi-envelope text-primary contact-icon"
-                                               title="Email: {{ egresso.email }}"></i>
+                                               title="E-mail: {{ egresso.email }}"></i>
                                         </td>
                                     </tr>
                                 {% empty %}
@@ -306,7 +306,7 @@
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="bi bi-send-fill me-2"></i>
-                    Enviar Questionário
+                    Enviar questionário
                 </button>
             </div>
         </form>
@@ -368,7 +368,7 @@
         document.getElementById('selected-count').textContent = count + ' selecionados';
     }
 
-    // Sincronizar select de formulário com o campo hidden do filtro
+    // Sincronizar select de formulário com o campo oculto do filtro.
     const formularioSelect = document.getElementById('id_formulario_select');
     const hiddenFormularioId = document.getElementById('hidden_formulario_id');
 
@@ -376,7 +376,7 @@
         hiddenFormularioId.value = this.value;
     });
 
-    // Sincronizar checkboxes de canais com os campos hidden do filtro
+    // Sincronizar checkboxes de canais com os campos ocultos do filtro.
     const canalCheckboxes = document.querySelectorAll('.canal-checkbox');
     const hiddenCanaisContainer = document.getElementById('hidden_canais_container');
 

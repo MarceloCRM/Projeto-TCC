@@ -6,12 +6,11 @@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-lg-8">
-            <h2 class="fw-bold">Estatísticas por Formulário</h2>
-            <p class="text-muted">Selecione um formulário para visualizar os dados e análises detalhadas.</p>
+            <h2 class="fw-bold">Estatísticas por formulário</h2>
+            <p class="text-muted">Selecione um formulário para visualizar os dados e as análises detalhadas.</p>
         </div>
     </div>
 
-    <!-- Filtros e Busca -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{% url 'estatistica:lista_formularios' %}" class="row g-3">
@@ -25,7 +24,7 @@
                 </div>
                 <div class="col-md-3">
                     <select name="status" class="form-select">
-                        <option value="">Todos os Status</option>
+                        <option value="">Todos os status</option>
                         <option value="ativo" {% if request.GET.status == 'ativo' %}selected{% endif %}>Ativo</option>
                         <option value="inativo" {% if request.GET.status == 'inativo' %}selected{% endif %}>Inativo</option>
                     </select>
@@ -63,7 +62,7 @@
                             <i class="bi bi-chat-left-text me-1"></i> {{ formulario.total_respostas }} respostas
                         </div>
                         <a href="{% url 'estatistica:detalhe_formulario' formulario.id %}" class="btn btn-primary btn-sm px-3">
-                            Ver Estatísticas
+                            Ver estatísticas
                         </a>
                     </div>
                 </div>

@@ -7,16 +7,16 @@
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="{% url 'formularios:listar_formularios' %}" class="text-decoration-none">Formularios</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'formularios:listar_formularios' %}" class="text-decoration-none">Formulários</a></li>
                 <li class="breadcrumb-item active">Adicionar pergunta</li>
             </ol>
         </nav>
         <h2 class="fw-bold mb-0">{{ formulario.titulo }}</h2>
-        <p class="text-muted mb-0 mt-1">Cadastre as perguntas que vao compor este formulario.</p>
+        <p class="text-muted mb-0 mt-1">Cadastre as perguntas que vão compor este formulário.</p>
     </div>
     <div class="d-flex gap-2">
         <a href="{% url 'formularios:editar_formulario' formulario_id=formulario.id %}" class="btn btn-outline-secondary">
-            <i class="bi bi-pencil-square me-1"></i> Editar formulario
+            <i class="bi bi-pencil-square me-1"></i> Editar formulário
         </a>
         <a href="{% url 'formularios:listar_formularios' %}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Voltar
@@ -74,19 +74,19 @@
 
                     <div id="opcoes" class="mt-4" style="display:none;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label fw-semibold mb-0">Opcoes de escolha</label>
+                            <label class="form-label fw-semibold mb-0">Opções de escolha</label>
                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="adicionarOpcao()">
-                                <i class="bi bi-plus-lg me-1"></i> Adicionar opcao
+                                <i class="bi bi-plus-lg me-1"></i> Adicionar opção
                             </button>
                         </div>
                         <p class="text-muted small mb-3">
                             Preencha as alternativas exibidas quando o tipo da pergunta for escolha.
                         </p>
                         <div id="lista-opcoes" class="d-grid gap-2">
-                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 1">
-                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 2">
-                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 3">
-                            <input type="text" name="opcoes" class="form-control" placeholder="Opcao 4">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opção 1">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opção 2">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opção 3">
+                            <input type="text" name="opcoes" class="form-control" placeholder="Opção 4">
                         </div>
                     </div>
 
@@ -106,18 +106,18 @@
     <div class="col-lg-5">
         <div class="card shadow-sm border-0">
             <div class="card-header py-3 px-4 fw-bold">
-                Resumo do formulario
+                Resumo do formulário
             </div>
             <div class="card-body p-4">
                 <h5 class="fw-semibold mb-2">{{ formulario.titulo }}</h5>
                 {% if formulario.descricao %}
                     <p class="text-muted mb-3">{{ formulario.descricao }}</p>
                 {% else %}
-                    <p class="text-muted mb-3">Este formulario ainda nao possui descricao cadastrada.</p>
+                    <p class="text-muted mb-3">Este formulário ainda não possui descrição cadastrada.</p>
                 {% endif %}
 
                 <div class="bg-light rounded p-3 small text-muted">
-                    Use perguntas objetivas e mantenha uma ordem logica para facilitar o preenchimento.
+                    Use perguntas objetivas e mantenha uma ordem lógica para facilitar o preenchimento.
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@
         input.type = "text";
         input.name = "opcoes";
         input.className = "form-control";
-        input.placeholder = `Opcao ${quantidade}`;
+        input.placeholder = `Opção ${quantidade}`;
         listaOpcoes.appendChild(input);
     }
 

@@ -1,12 +1,12 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Formularios | Acompanhamento de Egressos{% endblock %}
+{% block title %}Formulários | Acompanhamento de Egressos{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
-    <h3>Formularios</h3>
+    <h3>Formulários</h3>
     <a href="{% url 'formularios:criar_formulario' %}" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Criar Novo Formulario
+        <i class="bi bi-plus-circle"></i> Criar novo formulário
     </a>
 </div>
 
@@ -78,7 +78,7 @@
                     {% else %}
                         <tr>
                             <td colspan="5" class="text-center text-muted">
-                                Nenhum formulario cadastrado.
+                                Nenhum formulário cadastrado.
                             </td>
                         </tr>
                     {% endif %}
@@ -103,7 +103,7 @@
     function sortTable(n) {
         const tableBody = document.getElementById("tabela-formularios");
         const rows = Array.from(tableBody.querySelectorAll("tr"));
-        
+
         // Verifica se há dados na tabela
         if (rows.length === 1 && rows[0].cells.length === 1) return;
 
