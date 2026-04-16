@@ -1,0 +1,174 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Cursos | Acompanhamento de Egressos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cursos-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .cursos-nome-col {
+        width: 42%;
+    }
+
+    .cursos-meta-col {
+        width: 18%;
+    }
+
+    .cursos-table th,
+    .cursos-table td {
+        vertical-align: middle;
+    }
+
+    .cursos-table .cursos-nome-col {
+        white-space: normal;
+        word-break: break-word;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h3>Cursos</h3>
+    <a href="{% url 'curso:criar_curso' %}" class="btn btn-primary">Novo Curso</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-2">
+            <div class="col-md-5">
+                {{ form_filtro.busca }}
+            </div>
+
+            <div class="col-md-3">
+                {{ form_filtro.criado_em }}
+            </div>
+
+            <div class="col-md-2">
+                {{ form_filtro.status }}
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-outline-primary w-100">
+                    Buscar
+                </button>
+
+                <a href="{% url 'curso:listar_curso' %}" class="btn btn-secondary w-100">
+                    Limpar
+                </a>
+            </div>
+        </form>
+
+        <div class="mb-2 text-muted" style="margin-left: 5px;">
+            Total: {{ total }}
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small cursos-table">
+                <thead class="table-light">
+                    <tr>
+                        <th onclick="sortTable(0)" style="cursor: pointer;" class="cursos-nome-col">Nome <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(1)" style="cursor: pointer;" class="text-center cursos-meta-col">Egressos <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(2)" style="cursor: pointer;" class="text-center cursos-meta-col">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th onclick="sortTable(3)" style="cursor: pointer;" class="text-center cursos-meta-col">Criado em <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                        <th class="text-center cursos-meta-col">Acoes</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-cursos">
+                    {% if cursos %}
+                        {% for curso in cursos %}
+                            <tr>
+                                <td class="fw-bold cursos-nome-col">{{ curso.nome }}</td>
+                                <td class="text-center">{{ curso.total_egressos }}</td>
+                                <td class="text-center">
+                                    {% if curso.status == 'ativo' %}
+                                        <span class="badge bg-success-subtle text-success border">Ativo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary border">Inativo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ curso.criado_em|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{% url 'curso:detalhe_curso' curso.id %}" class="btn btn-sm btn-outline-info" title="Detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <a href="{% url 'curso:editar_curso' curso.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                Nenhum curso encontrado.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sortOrders = {};
+
+    function parseDate(dateStr) {
+        const parts = dateStr.split(/[\/\s:]/);
+        if (parts.length >= 5) {
+            return new Date(parts[2], parts[1] - 1, parts[0], parts[3], parts[4]);
+        }
+        return null;
+    }
+
+    function sortTable(n) {
+        const tableBody = document.getElementById("tabela-cursos");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+        if (rows.length === 1 && rows[0].cells.length === 1) return;
+
+        let dir = sortOrders[n] === "asc" ? "desc" : "asc";
+        sortOrders[n] = dir;
+
+        const sortedRows = rows.sort((a, b) => {
+            let x = a.cells[n].innerText.toLowerCase().trim();
+            let y = b.cells[n].innerText.toLowerCase().trim();
+
+            if (n === 3) {
+                let xDate = parseDate(x);
+                let yDate = parseDate(y);
+                if (xDate && yDate) {
+                    return dir === "asc" ? xDate - yDate : yDate - xDate;
+                }
+            }
+
+            let xNum = parseFloat(x.replace(/[^\d.-]/g, ''));
+            let yNum = parseFloat(y.replace(/[^\d.-]/g, ''));
+
+            if (!isNaN(xNum) && !isNaN(yNum) && n === 1) {
+                return dir === "asc" ? xNum - yNum : yNum - xNum;
+            }
+
+            return dir === "asc" ? x.localeCompare(y) : y.localeCompare(x);
+        });
+
+        tableBody.innerHTML = "";
+        sortedRows.forEach(row => tableBody.appendChild(row));
+
+        const icons = document.querySelectorAll('thead th i');
+        icons.forEach((icon, index) => {
+            if (index === n) {
+                icon.className = dir === 'asc' ? 'bi bi-caret-up-fill small text-primary' : 'bi bi-caret-down-fill small text-primary';
+            } else if (index < 4) {
+                icon.className = 'bi bi-arrow-down-up small text-muted';
+            }
+        });
+    }
+</script>
+{% endblock %}

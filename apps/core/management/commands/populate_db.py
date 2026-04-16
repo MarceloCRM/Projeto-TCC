@@ -4,12 +4,13 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from apps.curso.models import Curso
 from apps.egresso.models import Egresso
 from apps.formularios.models import Formulario, FormularioEgresso, Opcao, Pergunta, Resposta
 
 
 class Command(BaseCommand):
-    help = 'Popula o banco de dados com dados realistas para testes e estatísticas.'
+    help = 'Popula o banco de dados com dados realistas para testes e estatisticas.'
 
     def handle(self, *args, **options):
         self.stdout.write('Limpando o banco de dados atual...')
@@ -19,103 +20,147 @@ class Command(BaseCommand):
         Pergunta.objects.all().delete()
         Formulario.objects.all().delete()
         Egresso.objects.all().delete()
+        Curso.objects.all().delete()
 
         self.stdout.write('Criando Egressos...')
-        cursos = ['Engenharia de Computação', 'Ciência da Computação', 'Sistemas de Informação', 'Análise e Desenvolvimento de Sistemas']
-        empresas = ['Google', 'Meta', 'Amazon', 'Nubank', 'Itaú', 'Inter', 'Localiza', 'Totvs', 'Freelancer', 'Nenhuma']
+        cursos = [
+            Curso.objects.create(nome='Engenharia de Computacao'),
+            Curso.objects.create(nome='Ciencia da Computacao'),
+            Curso.objects.create(nome='Sistemas de Informacao'),
+            Curso.objects.create(nome='Analise e Desenvolvimento de Sistemas'),
+        ]
+        empresas = ['Google', 'Meta', 'Amazon', 'Nubank', 'Itau', 'Inter', 'Localiza', 'Totvs', 'Freelancer', 'Nenhuma']
         nomes = [
             'Ana Silva', 'Bruno Oliveira', 'Carla Santos', 'Diego Souza', 'Eduarda Lima',
-            'Fábio Pereira', 'Gabriela Costa', 'Henrique Rocha', 'Isabela Martins', 'João Ferreira',
-            'Katia Gomes', 'Lucas Almeida', 'Mariana Ribeiro', 'Natan Lopes', 'Olívia Mendes',
-            'Paulo Borges', 'Quênia Cavalcanti', 'Rafael Teixeira', 'Sara Cardoso', 'Tiago Machado',
+            'Fabio Pereira', 'Gabriela Costa', 'Henrique Rocha', 'Isabela Martins', 'Joao Ferreira',
+            'Katia Gomes', 'Lucas Almeida', 'Mariana Ribeiro', 'Natan Lopes', 'Olivia Mendes',
+            'Paulo Borges', 'Quenia Cavalcanti', 'Rafael Teixeira', 'Sara Cardoso', 'Tiago Machado',
             'Ursula Farias', 'Vitor Hugo', 'Wagner Jesus', 'Xuxa Meneghel', 'Yago Ramos', 'Zilda Arns'
         ]
 
         egressos = []
-        for i, nome in enumerate(nomes):
+        for nome in nomes:
             egresso = Egresso.objects.create(
                 nome_completo=nome,
                 email=f'{nome.lower().replace(" ", ".")}@exemplo.com',
                 whatsapp=f'119{random.randint(10000000, 99999999)}',
                 curso=random.choice(cursos),
                 ano_conclusao=random.randint(2018, 2024),
-                status=Egresso.STATUS_ATIVO
+                status=Egresso.STATUS_ATIVO,
             )
             egressos.append(egresso)
 
         self.stdout.write(f'{len(egressos)} egressos criados.')
 
-        self.stdout.write('Criando Formulários e Perguntas...')
-        
-        # Formulário 1: Satisfação do Curso
+        self.stdout.write('Criando Formularios e Perguntas...')
+
         f1 = Formulario.objects.create(
-            titulo='Pesquisa de Satisfação de Ex-Alunos',
-            descricao='Queremos saber sua opinião sobre o curso e sua trajetória profissional.',
-            status=Formulario.STATUS_ATIVO
+            titulo='Pesquisa de Satisfacao de Ex-Alunos',
+            descricao='Queremos saber sua opiniao sobre o curso e sua trajetoria profissional.',
+            status=Formulario.STATUS_ATIVO,
         )
-        
-        p1_1 = Pergunta.objects.create(formulario=f1, texto='Como você avalia a qualidade do ensino do seu curso?', tipo=Pergunta.TIPO_ESCALA, ordem=1)
-        p1_2 = Pergunta.objects.create(formulario=f1, texto='Qual sua principal área de atuação hoje?', tipo=Pergunta.TIPO_ESCOLHA, ordem=2)
+
+        p1_1 = Pergunta.objects.create(
+            formulario=f1,
+            texto='Como voce avalia a qualidade do ensino do seu curso?',
+            tipo=Pergunta.TIPO_ESCALA,
+            ordem=1,
+        )
+        p1_2 = Pergunta.objects.create(
+            formulario=f1,
+            texto='Qual sua principal area de atuacao hoje?',
+            tipo=Pergunta.TIPO_ESCOLHA,
+            ordem=2,
+        )
         Opcao.objects.create(pergunta=p1_2, texto='Desenvolvimento Web')
         Opcao.objects.create(pergunta=p1_2, texto='Data Science')
         Opcao.objects.create(pergunta=p1_2, texto='Infraestrutura/Cloud')
-        Opcao.objects.create(pergunta=p1_2, texto='Gestão de Projetos')
+        Opcao.objects.create(pergunta=p1_2, texto='Gestao de Projetos')
         Opcao.objects.create(pergunta=p1_2, texto='Outro')
-        
-        p1_3 = Pergunta.objects.create(formulario=f1, texto='Quanto tempo você levou para conseguir o primeiro emprego na área (em meses)?', tipo=Pergunta.TIPO_NUMERO, ordem=3)
-        p1_4 = Pergunta.objects.create(formulario=f1, texto='Deixe um comentário sobre como o curso ajudou na sua carreira.', tipo=Pergunta.TIPO_TEXTO, ordem=4)
 
-        # Formulário 2: Perfil Profissional 2026
+        Pergunta.objects.create(
+            formulario=f1,
+            texto='Quanto tempo voce levou para conseguir o primeiro emprego na area (em meses)?',
+            tipo=Pergunta.TIPO_NUMERO,
+            ordem=3,
+        )
+        Pergunta.objects.create(
+            formulario=f1,
+            texto='Deixe um comentario sobre como o curso ajudou na sua carreira.',
+            tipo=Pergunta.TIPO_TEXTO,
+            ordem=4,
+        )
+
         f2 = Formulario.objects.create(
             titulo='Acompanhamento Profissional 2026',
-            descricao='Atualização anual de dados dos egressos.',
-            status=Formulario.STATUS_ATIVO
+            descricao='Atualizacao anual de dados dos egressos.',
+            status=Formulario.STATUS_ATIVO,
         )
-        
-        p2_1 = Pergunta.objects.create(formulario=f2, texto='Você utiliza as tecnologias aprendidas no curso no seu dia a dia?', tipo=Pergunta.TIPO_ESCOLHA, ordem=1)
+
+        p2_1 = Pergunta.objects.create(
+            formulario=f2,
+            texto='Voce utiliza as tecnologias aprendidas no curso no seu dia a dia?',
+            tipo=Pergunta.TIPO_ESCOLHA,
+            ordem=1,
+        )
         Opcao.objects.create(pergunta=p2_1, texto='Sim, diariamente')
         Opcao.objects.create(pergunta=p2_1, texto='Sim, ocasionalmente')
         Opcao.objects.create(pergunta=p2_1, texto='Raramente')
-        Opcao.objects.create(pergunta=p2_1, texto='Não utilizo')
+        Opcao.objects.create(pergunta=p2_1, texto='Nao utilizo')
 
-        p2_2 = Pergunta.objects.create(formulario=f2, texto='Qual seu nível de satisfação com seu cargo atual?', tipo=Pergunta.TIPO_ESCALA, ordem=2)
-        p2_3 = Pergunta.objects.create(formulario=f2, texto='Qual o nome da sua empresa atual?', tipo=Pergunta.TIPO_TEXTO, ordem=3)
+        Pergunta.objects.create(
+            formulario=f2,
+            texto='Qual seu nivel de satisfacao com seu cargo atual?',
+            tipo=Pergunta.TIPO_ESCALA,
+            ordem=2,
+        )
+        Pergunta.objects.create(
+            formulario=f2,
+            texto='Qual o nome da sua empresa atual?',
+            tipo=Pergunta.TIPO_TEXTO,
+            ordem=3,
+        )
 
         self.stdout.write('Criando Respostas...')
-        
+
         formularios = [f1, f2]
-        for f in formularios:
-            perguntas = f.perguntas.all()
-            # Fazer 80% dos egressos responderem cada formulário
+        for formulario in formularios:
+            perguntas = formulario.perguntas.all()
             for egresso in random.sample(egressos, int(len(egressos) * 0.8)):
                 formulario_egresso = FormularioEgresso.objects.create(
-                    formulario=f,
+                    formulario=formulario,
                     egresso=egresso,
-                    utilizado=True
+                    utilizado=True,
                 )
                 respondido_em = timezone.now() - timedelta(days=random.randint(0, 30))
 
-                for p in perguntas:
-                    valor = ""
-                    if p.tipo == Pergunta.TIPO_TEXTO:
-                        if p.texto == 'Qual o nome da sua empresa atual?':
+                for pergunta in perguntas:
+                    valor = ''
+                    if pergunta.tipo == Pergunta.TIPO_TEXTO:
+                        if pergunta.texto == 'Qual o nome da sua empresa atual?':
                             valor = random.choice(empresas)
                         else:
-                            valor = random.choice(['O curso foi excelente!', 'Poderia ter mais aulas práticas.', 'Os professores são muito bons.', 'Aprendi muito sobre lógica.', 'Gostaria de ter visto mais tecnologias modernas.'])
-                    elif p.tipo == Pergunta.TIPO_NUMERO:
+                            valor = random.choice([
+                                'O curso foi excelente!',
+                                'Poderia ter mais aulas praticas.',
+                                'Os professores sao muito bons.',
+                                'Aprendi muito sobre logica.',
+                                'Gostaria de ter visto mais tecnologias modernas.',
+                            ])
+                    elif pergunta.tipo == Pergunta.TIPO_NUMERO:
                         valor = str(random.randint(0, 12))
-                    elif p.tipo == Pergunta.TIPO_ESCALA:
+                    elif pergunta.tipo == Pergunta.TIPO_ESCALA:
                         valor = str(random.randint(1, 5))
-                    elif p.tipo == Pergunta.TIPO_ESCOLHA:
-                        opcoes = list(p.opcoes.all())
+                    elif pergunta.tipo == Pergunta.TIPO_ESCOLHA:
+                        opcoes = list(pergunta.opcoes.all())
                         if opcoes:
                             valor = random.choice(opcoes).texto
-                    
+
                     Resposta.objects.create(
                         formulario_egresso=formulario_egresso,
-                        pergunta=p,
+                        pergunta=pergunta,
                         valor=valor,
-                        respondido_em=respondido_em
+                        respondido_em=respondido_em,
                     )
 
         self.stdout.write(self.style.SUCCESS('Banco de dados populado com sucesso!'))

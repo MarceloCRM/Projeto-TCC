@@ -11,7 +11,7 @@ from .services import enviar_formulario_egresso
 
 def enviar_formulario(request):
     formularios = Formulario.objects.filter(status=Formulario.STATUS_ATIVO)
-    egressos = Egresso.objects.filter(status=Egresso.STATUS_ATIVO)
+    egressos = Egresso.objects.select_related('curso').filter(status=Egresso.STATUS_ATIVO)
     form_filtro = EgressoFiltroForm(request.GET)
     formulario_id_get = request.GET.get('formulario_id')
     canais_get = request.GET.getlist('canais')
@@ -26,11 +26,11 @@ def enviar_formulario(request):
             egressos = egressos.filter(
                 Q(nome_completo__icontains=busca) |
                 Q(email__icontains=busca) |
-                Q(curso__icontains=busca)
+                Q(curso__nome__icontains=busca)
             )
 
         if curso:
-            egressos = egressos.filter(curso__icontains=curso)
+            egressos = egressos.filter(curso__nome__icontains=curso)
 
         if ano:
             egressos = egressos.filter(ano_conclusao=ano)
@@ -56,7 +56,7 @@ def enviar_formulario(request):
             return redirect('envio:enviar_formulario')
 
         formulario = get_object_or_404(Formulario, pk=formulario_id)
-        egressos_selecionados = Egresso.objects.filter(pk__in=ids_egressos_selecionados)
+        egressos_selecionados = Egresso.objects.select_related('curso').filter(pk__in=ids_egressos_selecionados)
 
         resultados = enviar_formulario_egresso(
             formulario,

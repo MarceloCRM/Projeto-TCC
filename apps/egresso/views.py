@@ -6,7 +6,7 @@ from apps.egresso.models import Egresso
 
 
 def listar_egresso(request):
-    egressos = Egresso.objects.all().order_by('-criado_em')
+    egressos = Egresso.objects.select_related('curso').all().order_by('-criado_em')
     form_filtro = EgressoFiltroForm(request.GET)
 
     if form_filtro.is_valid():
@@ -19,11 +19,11 @@ def listar_egresso(request):
             egressos = egressos.filter(
                 Q(nome_completo__icontains=busca) |
                 Q(email__icontains=busca) |
-                Q(curso__icontains=busca)
+                Q(curso__nome__icontains=busca)
             )
 
         if curso:
-            egressos = egressos.filter(curso__icontains=curso)
+            egressos = egressos.filter(curso__nome__icontains=curso)
 
         if ano:
             egressos = egressos.filter(ano_conclusao=ano)
@@ -53,7 +53,7 @@ def criar_egresso(request):
 
 
 def editar_egresso(request, pk):
-    egresso = get_object_or_404(Egresso, pk=pk)
+    egresso = get_object_or_404(Egresso.objects.select_related('curso'), pk=pk)
 
     if request.method == 'POST':
         form = EgressoForm(request.POST, instance=egresso)
@@ -72,7 +72,7 @@ def editar_egresso(request, pk):
 
 
 def detalhe_egresso(request, pk):
-    egresso = get_object_or_404(Egresso, pk=pk)
+    egresso = get_object_or_404(Egresso.objects.select_related('curso'), pk=pk)
 
     return render(
         request,

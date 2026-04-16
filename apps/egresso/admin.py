@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from apps.egresso.models import Egresso
 
 @admin.register(Egresso)
@@ -15,7 +16,7 @@ class EgressoAdmin(admin.ModelAdmin):
         'nome_completo',
         'email',
         'whatsapp',
-        'curso',
+        'curso__nome',
     )
 
     list_filter = (

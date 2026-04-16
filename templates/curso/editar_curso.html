@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Editar Curso | Acompanhamento de Egressos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'curso:listar_curso' %}" class="text-decoration-none">Cursos</a></li>
+                <li class="breadcrumb-item active">Editar</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold mb-0">Editar curso</h2>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'curso:detalhe_curso' curso.id %}" class="btn btn-outline-info">
+            <i class="bi bi-eye me-1"></i> Detalhes
+        </a>
+        <a href="{% url 'curso:listar_curso' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header py-3 px-4 fw-bold">
+                Dados do curso
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label fw-semibold">Nome do curso</label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
+                            <div class="text-danger small mt-1">{{ form.nome.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.status.id_for_label }}" class="form-label fw-semibold">Status</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i> Salvar
+                        </button>
+                        <a href="{% url 'curso:listar_curso' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header py-3 px-4 fw-bold">
+                Resumo
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <small class="text-muted d-block mb-1">Curso atual</small>
+                    <div class="fw-semibold">{{ curso.nome }}</div>
+                </div>
+
+                <div class="mb-4">
+                    <small class="text-muted d-block mb-1">Egressos vinculados</small>
+                    <div class="fw-semibold">{{ total_egressos }}</div>
+                </div>
+
+                <div class="bg-light rounded p-3 small text-muted">
+                    Alterar o nome do curso atualiza automaticamente a exibicao nos modulos que usam esse relacionamento.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

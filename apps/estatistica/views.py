@@ -59,11 +59,11 @@ def index(request):
         dados_respostas.append(respostas_por_data.get(data_atual, 0))
 
     cursos = (
-        Egresso.objects.values('curso')
+        Egresso.objects.values('curso__nome')
         .annotate(total=Count('id'))
-        .order_by('-total', 'curso')[:8]
+        .order_by('-total', 'curso__nome')[:8]
     )
-    labels_cursos = [curso['curso'] or 'Nao informado' for curso in cursos]
+    labels_cursos = [curso['curso__nome'] or 'Nao informado' for curso in cursos]
     dados_cursos = [curso['total'] for curso in cursos]
 
     formularios_populares = (
@@ -84,7 +84,7 @@ def index(request):
 
     respostas_recentes = list(
         FormularioEgresso.objects.filter(respostas__isnull=False)
-        .select_related('egresso', 'formulario')
+        .select_related('egresso__curso', 'formulario')
         .annotate(ultima_resposta_em=Max('respostas__respondido_em'))
         .order_by('-ultima_resposta_em')[:8]
     )
@@ -114,7 +114,7 @@ def index(request):
         'possui_ranking_formularios': bool(dados_formularios),
         'possui_cursos': bool(dados_cursos),
     }
-    return render(request, 'estatistica/index.html', context)
+    return render(request, 'estatistica/painel.html', context)
 
 
 def lista_formularios(request):

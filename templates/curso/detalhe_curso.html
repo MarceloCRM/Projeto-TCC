@@ -1,0 +1,182 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Detalhes do Curso | Acompanhamento de Egressos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .curso-hero {
+        background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+    }
+
+    .curso-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .info-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #6c757d;
+        margin-bottom: 0.35rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #212529;
+        word-break: break-word;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'curso:listar_curso' %}" class="text-decoration-none">Cursos</a></li>
+                <li class="breadcrumb-item active">Detalhes</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold mb-0">Detalhes do curso</h2>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'curso:editar_curso' curso.id %}" class="btn btn-outline-secondary">
+            <i class="bi bi-pencil me-1"></i> Editar
+        </a>
+        <a href="{% url 'curso:listar_curso' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 curso-hero">
+            <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="curso-avatar">
+                            {{ curso.nome|slice:":1"|upper }}
+                        </div>
+
+                        <div>
+                            <small class="text-muted d-block mb-1">Cadastro de curso</small>
+                            <h3 class="mb-1">{{ curso.nome }}</h3>
+                            <p class="text-muted mb-0">{{ curso.total_egressos }} egresso{{ curso.total_egressos|pluralize }}</p>
+                        </div>
+                    </div>
+
+                    <div class="text-md-end">
+                        <small class="text-muted d-block mb-2">Situacao atual</small>
+                        {% if curso.status == 'ativo' %}
+                            <span class="badge bg-success-subtle text-success border px-3 py-2">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border px-3 py-2">Inativo</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 px-4 fw-bold">
+                Informacoes principais
+            </div>
+
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <span class="info-label">Nome</span>
+                    <div class="info-value">{{ curso.nome }}</div>
+                </div>
+
+                <div class="mb-4">
+                    <span class="info-label">Total de egressos</span>
+                    <div class="info-value">{{ curso.total_egressos }}</div>
+                </div>
+
+                <div class="mb-4">
+                    <span class="info-label">Status</span>
+                    <div class="info-value">{{ curso.get_status_display }}</div>
+                </div>
+
+                <div class="mb-4">
+                    <span class="info-label">Criado em</span>
+                    <div class="info-value">{{ curso.criado_em|date:"d/m/Y H:i" }}</div>
+                </div>
+
+                <div>
+                    <span class="info-label">Ultima atualizacao</span>
+                    <div class="info-value">{{ curso.atualizado_em|date:"d/m/Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 px-4 fw-bold">
+                Egressos vinculados
+            </div>
+
+            <div class="card-body p-0">
+                {% if possui_egressos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Nome</th>
+                                    <th>E-mail</th>
+                                    <th class="text-center">Ano de conclusao</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Acoes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for egresso in egressos %}
+                                    <tr>
+                                        <td class="ps-4 fw-semibold">{{ egresso.nome_completo }}</td>
+                                        <td>{{ egresso.email }}</td>
+                                        <td class="text-center">{{ egresso.ano_conclusao }}</td>
+                                        <td class="text-center">
+                                            {% if egresso.status == 'ativo' %}
+                                                <span class="badge bg-success-subtle text-success border">Ativo</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary-subtle text-secondary border">Inativo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <a href="{% url 'egresso:detalhe_egresso' egresso.id %}" class="btn btn-sm btn-outline-info" title="Detalhes do egresso">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-muted">
+                        Nenhum egresso esta vinculado a este curso no momento.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

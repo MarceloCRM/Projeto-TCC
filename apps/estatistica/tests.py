@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from apps.curso.models import Curso
 from apps.egresso.models import Egresso
 from apps.formularios.models import Formulario, FormularioEgresso, Opcao, Pergunta, Resposta
 
@@ -23,11 +24,14 @@ class PainelEstatisticaTests(TestCase):
         self.assertFalse(response.context['possui_respostas_recentes'])
 
     def test_painel_agrega_dados_de_envio_resposta_e_curso(self):
+        curso_si = Curso.objects.create(nome='Sistemas de Informacao')
+        curso_cc = Curso.objects.create(nome='Ciencia da Computacao')
+
         egresso_1 = Egresso.objects.create(
             nome_completo='Ana Silva',
             email='ana@example.com',
             whatsapp='11999999999',
-            curso='Sistemas de Informacao',
+            curso=curso_si,
             ano_conclusao=2023,
             status=Egresso.STATUS_ATIVO,
         )
@@ -35,7 +39,7 @@ class PainelEstatisticaTests(TestCase):
             nome_completo='Bruno Souza',
             email='bruno@example.com',
             whatsapp='11888888888',
-            curso='Ciencia da Computacao',
+            curso=curso_cc,
             ano_conclusao=2022,
             status=Egresso.STATUS_ATIVO,
         )
@@ -136,13 +140,14 @@ class DetalheFormularioEstatisticaTests(TestCase):
 
         respostas_escolha = ['TI', 'Educacao', 'Educacao']
         respostas_escala = ['5', '4', '4']
+        curso = Curso.objects.create(nome='Sistemas de Informacao')
 
         for indice in range(3):
             egresso = Egresso.objects.create(
                 nome_completo=f'Egresso {indice}',
                 email=f'egresso{indice}@example.com',
                 whatsapp=f'1199999999{indice}',
-                curso='Sistemas de Informacao',
+                curso=curso,
                 ano_conclusao=2020 + indice,
                 status=Egresso.STATUS_ATIVO,
             )

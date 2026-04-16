@@ -95,10 +95,9 @@
             color: #fff;
         }
 
-        .breadcrumb-item + .breadcrumb-item::before { 
-            content: "/" !important; 
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "/" !important;
         }
-
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -115,7 +114,7 @@
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
                 <a href="{% url 'estatistica:index' %}" class="nav-link {% if request.resolver_match.view_name == 'estatistica:index' %}active{% endif %}">
-                    <i class="bi bi-bar-chart"></i> Relatório Geral
+                    <i class="bi bi-bar-chart"></i> Relatorio Geral
                 </a>
             </li>
             <li class="nav-item">
@@ -123,19 +122,24 @@
                     <i class="bi bi-people"></i> Egressos
                 </a>
             </li>
-            <li>
+            <li class="nav-item">
+                <a href="{% url 'curso:listar_curso' %}" class="nav-link {% if request.resolver_match.app_name == 'curso' %}active{% endif %}">
+                    <i class="bi bi-mortarboard"></i> Cursos
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{% url 'formularios:listar_formularios' %}" class="nav-link {% if request.resolver_match.app_name == 'formularios' %}active{% endif %}">
-                    <i class="bi bi-file-earmark-text"></i> Formulários
+                    <i class="bi bi-file-earmark-text"></i> Formularios
                 </a>
             </li>
-            <li>
+            <li class="nav-item">
                 <a href="{% url 'envio:enviar_formulario' %}" class="nav-link {% if request.resolver_match.url_name == 'enviar_formulario' %}active{% endif %}">
-                    <i class="bi bi-file-earmark-text"></i> Envio de formulários
+                    <i class="bi bi-file-earmark-text"></i> Envio de formularios
                 </a>
             </li>
-            <li>
+            <li class="nav-item">
                 <a href="{% url 'estatistica:lista_formularios' %}" class="nav-link {% if request.resolver_match.app_name == 'estatistica' and request.resolver_match.url_name != 'index' %}active{% endif %}">
-                    <i class="bi bi-graph-up"></i> Estatísticas
+                    <i class="bi bi-graph-up"></i> Estatisticas
                 </a>
             </li>
         </ul>
