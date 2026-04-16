@@ -6,6 +6,48 @@ from .forms import FormularioFiltroForm, FormularioForm, PerguntaForm
 from .models import Formulario, FormularioEgresso, Opcao, Pergunta, Resposta
 
 
+def _get_valid_option_texts(option_values):
+    return [texto.strip() for texto in option_values if texto.strip()]
+
+
+def _validate_multiple_choice_options(form, option_count):
+    if form.cleaned_data.get('tipo') == Pergunta.TIPO_ESCOLHA and option_count < 2:
+        form.add_error(
+            None,
+            'Perguntas de múltipla escolha devem ter pelo menos duas opções de resposta.',
+        )
+        return False
+
+    return True
+
+
+def _get_submitted_answers(request, perguntas):
+    respostas_enviadas = {}
+
+    for pergunta in perguntas:
+        valor = request.POST.get(f'pergunta_{pergunta.pk}', '')
+        respostas_enviadas[pergunta.pk] = valor.strip() if isinstance(valor, str) else valor
+
+    return respostas_enviadas
+
+
+def _validate_required_answers(perguntas, respostas_enviadas):
+    erros_pergunta = {}
+
+    for pergunta in perguntas:
+        valor = respostas_enviadas.get(pergunta.pk, '')
+        if pergunta.obrigatoria and not valor:
+            erros_pergunta[pergunta.pk] = 'Esta pergunta é obrigatória.'
+
+    return erros_pergunta
+
+
+def _apply_answer_state(perguntas, respostas_enviadas, erros_pergunta):
+    for pergunta in perguntas:
+        pergunta.resposta_enviada = respostas_enviadas.get(pergunta.pk, '')
+        pergunta.erro_resposta = erros_pergunta.get(pergunta.pk, '')
+
+
 def listar_formularios(request):
     formularios = Formulario.objects.all().order_by('-criado_em')
     form_filtro = FormularioFiltroForm(request.GET)
@@ -50,7 +92,7 @@ def editar_formulario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
 
     form_formulario = FormularioForm(instance=formulario)
-    form_pergunta = PerguntaForm()
+    form_pergunta = PerguntaForm(formulario=formulario)
 
     if request.method == 'POST':
         if 'salvar_formulario' in request.POST:
@@ -60,20 +102,28 @@ def editar_formulario(request, formulario_id):
                 return redirect('formularios:editar_formulario', formulario_id=formulario.id)
 
         elif 'salvar_pergunta' in request.POST:
-            form_pergunta = PerguntaForm(request.POST)
+            form_pergunta = PerguntaForm(request.POST, formulario=formulario)
             if form_pergunta.is_valid():
+                opcoes = _get_valid_option_texts(request.POST.getlist('opcoes'))
+                if not _validate_multiple_choice_options(form_pergunta, len(opcoes)):
+                    perguntas = formulario.perguntas.all()
+                    return render(request, 'formularios/editar_formulario.html', {
+                        'formulario': formulario,
+                        'form_formulario': form_formulario,
+                        'form_pergunta': form_pergunta,
+                        'perguntas': perguntas,
+                    })
+
                 pergunta = form_pergunta.save(commit=False)
                 pergunta.formulario = formulario
                 pergunta.save()
 
                 if pergunta.tipo == Pergunta.TIPO_ESCOLHA:
-                    opcoes = request.POST.getlist('opcoes')
                     for texto in opcoes:
-                        if texto.strip():
-                            Opcao.objects.create(
-                                pergunta=pergunta,
-                                texto=texto,
-                            )
+                        Opcao.objects.create(
+                            pergunta=pergunta,
+                            texto=texto,
+                        )
 
                 return redirect('formularios:editar_formulario', formulario_id=formulario.id)
 
@@ -91,24 +141,29 @@ def criar_pergunta(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
 
     if request.method == 'POST':
-        form = PerguntaForm(request.POST)
+        form = PerguntaForm(request.POST, formulario=formulario)
         if form.is_valid():
+            opcoes = _get_valid_option_texts(request.POST.getlist('opcoes'))
+            if not _validate_multiple_choice_options(form, len(opcoes)):
+                return render(request, 'formularios/criar_pergunta.html', {
+                    'form': form,
+                    'formulario': formulario,
+                })
+
             pergunta = form.save(commit=False)
             pergunta.formulario = formulario
             pergunta.save()
 
             if pergunta.tipo == Pergunta.TIPO_ESCOLHA:
-                opcoes = request.POST.getlist('opcoes')
                 for texto in opcoes:
-                    if texto.strip():
-                        Opcao.objects.create(
-                            pergunta=pergunta,
-                            texto=texto,
-                        )
+                    Opcao.objects.create(
+                        pergunta=pergunta,
+                        texto=texto,
+                    )
 
             return redirect('formularios:criar_pergunta', formulario_id=formulario.id)
     else:
-        form = PerguntaForm()
+        form = PerguntaForm(formulario=formulario)
 
     return render(request, 'formularios/criar_pergunta.html', {
         'form': form,
@@ -121,9 +176,22 @@ def editar_pergunta(request, pergunta_id):
     formulario = pergunta.formulario
 
     if request.method == 'POST':
-        form = PerguntaForm(request.POST, instance=pergunta)
+        form = PerguntaForm(request.POST, instance=pergunta, formulario=formulario)
 
         if form.is_valid():
+            novas_opcoes = _get_valid_option_texts(request.POST.getlist('novas_opcoes'))
+            opcoes_existentes = pergunta.opcoes.count() if pergunta.tipo == Pergunta.TIPO_ESCOLHA else 0
+
+            if form.cleaned_data.get('tipo') == Pergunta.TIPO_ESCOLHA and pergunta.tipo != Pergunta.TIPO_ESCOLHA:
+                opcoes_existentes = 0
+
+            if not _validate_multiple_choice_options(form, opcoes_existentes + len(novas_opcoes)):
+                return render(request, 'formularios/editar_pergunta.html', {
+                    'form': form,
+                    'formulario': formulario,
+                    'pergunta': pergunta,
+                })
+
             pergunta = form.save()
             if pergunta.tipo == Pergunta.TIPO_ESCOLHA:
                 opcao_ids = request.POST.getlist('opcao_id')
@@ -136,18 +204,15 @@ def editar_pergunta(request, pergunta_id):
                             pergunta=pergunta,
                         ).update(texto=texto)
 
-                novas_opcoes = request.POST.getlist('novas_opcoes')
-
                 for texto in novas_opcoes:
-                    if texto.strip():
-                        Opcao.objects.create(
-                            pergunta=pergunta,
-                            texto=texto,
-                        )
+                    Opcao.objects.create(
+                        pergunta=pergunta,
+                        texto=texto,
+                    )
 
             return redirect('formularios:editar_formulario', formulario_id=formulario.id)
     else:
-        form = PerguntaForm(instance=pergunta)
+        form = PerguntaForm(instance=pergunta, formulario=formulario)
 
     return render(request, 'formularios/editar_pergunta.html', {
         'form': form,
@@ -166,11 +231,23 @@ def responder_questionario(request, token):
     perguntas = formulario.perguntas.prefetch_related('opcoes').all()
 
     if request.method == 'POST':
+        respostas_enviadas = _get_submitted_answers(request, perguntas)
+        erros_pergunta = _validate_required_answers(perguntas, respostas_enviadas)
+        _apply_answer_state(perguntas, respostas_enviadas, erros_pergunta)
+
+        if erros_pergunta:
+            return render(request, 'formularios/responder.html', {
+                'formulario': formulario,
+                'perguntas': perguntas,
+                'egresso': link.egresso,
+                'erro_formulario': 'Responda todas as perguntas obrigatórias antes de enviar.',
+            })
+
         respondido_em = timezone.now()
         link.respostas.all().delete()
 
         for pergunta in perguntas:
-            valor = request.POST.get(f'pergunta_{pergunta.pk}', '').strip()
+            valor = respostas_enviadas.get(pergunta.pk, '')
             if valor:
                 Resposta.objects.create(
                     formulario_egresso=link,
@@ -183,6 +260,8 @@ def responder_questionario(request, token):
         link.save(update_fields=['utilizado'])
 
         return redirect('formularios:obrigado')
+
+    _apply_answer_state(perguntas, {}, {})
 
     return render(request, 'formularios/responder.html', {
         'formulario': formulario,

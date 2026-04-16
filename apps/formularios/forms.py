@@ -99,6 +99,31 @@ class FormularioFiltroForm(forms.Form):
 
 
 class PerguntaForm(forms.ModelForm):
+    def __init__(self, *args, formulario=None, **kwargs):
+        self.formulario = formulario
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        obrigatoria = cleaned_data.get('obrigatoria')
+
+        formulario = self.formulario
+        if not formulario and self.instance.pk:
+            formulario = self.instance.formulario
+
+        if formulario and not obrigatoria:
+            perguntas_obrigatorias = formulario.perguntas.filter(obrigatoria=True)
+
+            if self.instance.pk:
+                perguntas_obrigatorias = perguntas_obrigatorias.exclude(pk=self.instance.pk)
+
+            if not perguntas_obrigatorias.exists():
+                raise forms.ValidationError(
+                    'O formulário precisa ter pelo menos uma pergunta obrigatória.'
+                )
+
+        return cleaned_data
+
     class Meta:
         model = Pergunta
         fields = ['texto', 'tipo', 'ordem', 'obrigatoria']

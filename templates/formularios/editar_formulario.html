@@ -109,6 +109,15 @@
                                             <span class="badge bg-secondary ms-2">
                                                 {{ pergunta.get_tipo_display }}
                                             </span>
+                                            {% if pergunta.obrigatoria %}
+                                                <span class="badge bg-warning-subtle text-warning-emphasis border ms-2">
+                                                    Obrigatória
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-light text-muted border ms-2">
+                                                    Opcional
+                                                </span>
+                                            {% endif %}
 
                                             {% if pergunta.tipo == 'escolha' %}
                                                 <ul class="mt-2">

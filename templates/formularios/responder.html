@@ -136,6 +136,11 @@
       box-shadow: var(--shadow);
     }
 
+    .pergunta-cartao.invalida {
+      border-color: #fca5a5;
+      box-shadow: 0 20px 50px rgba(239, 68, 68, 0.10);
+    }
+
     .pergunta-num {
       display: inline-flex;
       align-items: center;
@@ -294,6 +299,13 @@
       box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
     }
 
+    .erro-pergunta {
+      margin-top: 0.85rem;
+      color: #dc2626;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
     .btn-enviar {
       width: 100%;
       padding: 1rem 1.25rem;
@@ -413,8 +425,14 @@
   <form method="post" id="form-survey" novalidate>
     {% csrf_token %}
 
+    {% if erro_formulario %}
+    <div class="alert alert-danger border-0 shadow-sm mb-4">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ erro_formulario }}
+    </div>
+    {% endif %}
+
     {% for pergunta in perguntas %}
-    <div class="pergunta-cartao" id="cartao-{{ pergunta.pk }}">
+    <div class="pergunta-cartao {% if pergunta.erro_resposta %}invalida{% endif %}" id="cartao-{{ pergunta.pk }}">
       <div class="d-flex align-items-start mb-1">
         <span class="pergunta-num">{{ forloop.counter }}</span>
         <p class="pergunta-texto mb-0">
@@ -432,6 +450,7 @@
                  value="{{ op.texto }}"
                  class="opcao-radio resposta-input"
                  data-pergunta="{{ pergunta.pk }}"
+                 {% if pergunta.resposta_enviada == op.texto %}checked{% endif %}
                  {% if pergunta.obrigatoria %}required{% endif %}>
           <label for="op_{{ op.pk }}" class="opcao-label">
             <span class="opcao-bolinha"></span>
@@ -452,6 +471,7 @@
                    value="{{ i }}"
                    class="escala-radio resposta-input"
                    data-pergunta="{{ pergunta.pk }}"
+                   {% if pergunta.resposta_enviada == i %}checked{% endif %}
                    {% if pergunta.obrigatoria %}required{% endif %}>
             <label for="escala_{{ pergunta.pk }}_{{ i }}" class="escala-label">{{ i }}</label>
             {% endfor %}
@@ -468,7 +488,7 @@
                     data-pergunta="{{ pergunta.pk }}"
                     rows="3"
                     placeholder="Digite sua resposta..."
-                    {% if pergunta.obrigatoria %}required{% endif %}></textarea>
+                    {% if pergunta.obrigatoria %}required{% endif %}>{{ pergunta.resposta_enviada }}</textarea>
         </div>
 
       {% elif pergunta.tipo == 'numero' %}
@@ -477,9 +497,16 @@
                  name="pergunta_{{ pergunta.pk }}"
                  class="input-numerico resposta-input"
                  data-pergunta="{{ pergunta.pk }}"
+                 value="{{ pergunta.resposta_enviada }}"
                  placeholder="Digite um número..."
                  {% if pergunta.obrigatoria %}required{% endif %}>
         </div>
+      {% endif %}
+
+      {% if pergunta.erro_resposta %}
+      <div class="erro-pergunta">
+        {{ pergunta.erro_resposta }}
+      </div>
       {% endif %}
     </div>
     {% endfor %}
@@ -499,24 +526,48 @@ const total = {{ perguntas.count }};
 const respondidas = new Set();
 
 document.querySelectorAll('.resposta-input').forEach(el => {
+  const q = el.dataset.pergunta;
+  if (el.type === 'radio') {
+    if (document.querySelector(`.resposta-input[data-pergunta="${q}"]:checked`)) {
+      respondidas.add(q);
+    }
+  } else if (el.value.trim()) {
+    respondidas.add(q);
+  }
+
   el.addEventListener('change', () => {
-    const q = el.dataset.pergunta;
-    if (el.value.trim()) respondidas.add(q);
-    else respondidas.delete(q);
+    if (el.type === 'radio') {
+      if (document.querySelector(`.resposta-input[data-pergunta="${q}"]:checked`)) {
+        respondidas.add(q);
+      } else {
+        respondidas.delete(q);
+      }
+    } else if (el.value.trim()) {
+      respondidas.add(q);
+    } else {
+      respondidas.delete(q);
+    }
+
     const pct = total > 0 ? (respondidas.size / total * 100) : 0;
     document.getElementById('barra-progresso').style.width = pct + '%';
     document.getElementById('progresso-texto').textContent = `${respondidas.size} de ${total} respondidas`;
   });
 
   el.addEventListener('input', () => {
-    const q = el.dataset.pergunta;
-    if (el.value.trim()) respondidas.add(q);
-    else respondidas.delete(q);
-    const pct = total > 0 ? (respondidas.size / total * 100) : 0;
-    document.getElementById('barra-progresso').style.width = pct + '%';
-    document.getElementById('progresso-texto').textContent = `${respondidas.size} de ${total} respondidas`;
+    if (el.type !== 'radio') {
+      if (el.value.trim()) respondidas.add(q);
+      else respondidas.delete(q);
+
+      const pct = total > 0 ? (respondidas.size / total * 100) : 0;
+      document.getElementById('barra-progresso').style.width = pct + '%';
+      document.getElementById('progresso-texto').textContent = `${respondidas.size} de ${total} respondidas`;
+    }
   });
 });
+
+const pct = total > 0 ? (respondidas.size / total * 100) : 0;
+document.getElementById('barra-progresso').style.width = pct + '%';
+document.getElementById('progresso-texto').textContent = `${respondidas.size} de ${total} respondidas`;
 </script>
 </body>
 </html>
