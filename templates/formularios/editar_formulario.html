@@ -1,4 +1,23 @@
 {% extends 'core/base.html' %}
+{% block extra_css %}
+<style>
+    .pergunta-item-header {
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .pergunta-item-conteudo {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .pergunta-item-acao {
+        flex-shrink: 0;
+        align-self: flex-start;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
 {% block content %}
 <div>
     <nav aria-label="breadcrumb">
@@ -83,8 +102,8 @@
                         <ul class="list-group list-group-flush">
                             {% for pergunta in perguntas %}
                                 <li class="list-group-item">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
+                                    <div class="d-flex justify-content-between pergunta-item-header">
+                                        <div class="pergunta-item-conteudo">
                                             <strong>{{ pergunta.ordem }}.</strong>
                                             {{ pergunta.texto }}
                                             <span class="badge bg-secondary ms-2">
@@ -101,7 +120,7 @@
                                         </div>
 
                                         <a href="{% url 'formularios:editar_pergunta' pergunta_id=pergunta.id %}"
-                                           class="btn btn-sm btn-outline-primary">
+                                           class="btn btn-sm btn-outline-primary pergunta-item-acao">
                                             Editar
                                         </a>
                                     </div>
