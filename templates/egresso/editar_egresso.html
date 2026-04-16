@@ -1,11 +1,21 @@
 {% extends 'core/base.html' %}
 
+{% block extra_css %}
+<style>
+    .country-code-select {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow-sm w-100" style="max-width: 700px;">
         <div class="card-body p-4">
             <h4 class="text-center mb-4">
-                <strong>Editar Egresso</strong>
+                <strong>Editar egresso</strong>
             </h4>
 
             <form method="post">
@@ -13,7 +23,7 @@
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Nome Completo <span class="text-danger">*</span></label>
+                        <label class="form-label">Nome completo <span class="text-danger">*</span></label>
                         {{ form.nome_completo }}
                         {% if form.nome_completo.errors %}
                             <div class="text-danger small mt-1">{{ form.nome_completo.errors.0 }}</div>
@@ -30,7 +40,21 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Número de WhatsApp <span class="text-danger">*</span></label>
-                        {{ form.whatsapp }}
+                        <div class="row g-2">
+                            <div class="col-5">
+                                {{ form.country_code }}
+                            </div>
+                            <div class="col-7">
+                                {{ form.whatsapp }}
+                            </div>
+                        </div>
+                        <div class="form-text">Escolha o país e digite apenas o DDD com o número.</div>
+                        {% if form.country_code.errors %}
+                            <div class="text-danger small mt-1">{{ form.country_code.errors.0 }}</div>
+                        {% endif %}
+                        {% if form.whatsapp.errors %}
+                            <div class="text-danger small mt-1">{{ form.whatsapp.errors.0 }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="col-md-6">
@@ -42,13 +66,19 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Ano de Conclusão <span class="text-danger">*</span></label>
+                        <label class="form-label">Ano de conclusão <span class="text-danger">*</span></label>
                         {{ form.ano_conclusao }}
+                        {% if form.ano_conclusao.errors %}
+                            <div class="text-danger small mt-1">{{ form.ano_conclusao.errors.0 }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Status <span class="text-danger">*</span></label>
                         {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-danger small mt-1">{{ form.status.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -65,4 +95,66 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const input = document.querySelector('[data-whatsapp-input="true"]');
+        const countrySelect = document.querySelector('[data-country-code-select="true"]');
+        if (!input || !countrySelect) {
+            return;
+        }
+
+        function formatNationalNumber(value) {
+            const digits = value.replace(/\D/g, '').slice(0, 15);
+            if (!digits) {
+                return '';
+            }
+            if (digits.length <= 2) {
+                return `(${digits}`;
+            }
+            return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+        }
+
+        function buildShortLabel(option) {
+            const match = option.textContent.match(/\(\+(\d+)\)/);
+            const code = match ? `+${match[1]}` : '';
+            return `${option.value} ${code}`.trim();
+        }
+
+        function setFullLabels() {
+            Array.from(countrySelect.options).forEach(option => {
+                if (!option.dataset.fullLabel) {
+                    option.dataset.fullLabel = option.textContent.trim();
+                    option.dataset.shortLabel = buildShortLabel(option);
+                }
+                option.textContent = option.dataset.fullLabel;
+            });
+        }
+
+        function setCompactSelectedLabel() {
+            setFullLabels();
+            const selected = countrySelect.options[countrySelect.selectedIndex];
+            if (!selected) {
+                return;
+            }
+            selected.textContent = selected.dataset.shortLabel;
+            countrySelect.title = selected.dataset.fullLabel;
+            countrySelect.classList.add('country-code-select');
+        }
+
+        input.addEventListener('input', function () {
+            this.value = formatNationalNumber(this.value);
+        });
+
+        countrySelect.addEventListener('focus', setFullLabels);
+        countrySelect.addEventListener('mousedown', setFullLabels);
+        countrySelect.addEventListener('change', setCompactSelectedLabel);
+        countrySelect.addEventListener('blur', setCompactSelectedLabel);
+
+        input.value = formatNationalNumber(input.value);
+        setCompactSelectedLabel();
+    })();
+</script>
 {% endblock %}

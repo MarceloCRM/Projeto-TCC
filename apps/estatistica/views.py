@@ -114,7 +114,7 @@ def index(request):
         'possui_ranking_formularios': bool(dados_formularios),
         'possui_cursos': bool(dados_cursos),
     }
-    return render(request, 'estatistica/painel.html', context)
+    return render(request, 'estatistica/index.html', context)
 
 
 def lista_formularios(request):
