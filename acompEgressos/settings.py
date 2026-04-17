@@ -48,7 +48,7 @@ if not SECRET_KEY:
     raise ImproperlyConfigured('Defina a variável SECRET_KEY no arquivo .env.')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
