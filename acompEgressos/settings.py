@@ -48,11 +48,13 @@ if not SECRET_KEY:
     raise ImproperlyConfigured('Defina a variável SECRET_KEY no arquivo .env.')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["tccacompegressos-production.up.railway.app", "localhost", "127.0.0.1"]
 
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://tccacompegressos-production.up.railway.app",
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -72,6 +74,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -147,7 +150,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Configuração Twilio (WhatsApp) — preencher no .env
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
