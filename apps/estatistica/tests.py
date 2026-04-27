@@ -116,6 +116,21 @@ class PainelEstatisticaTests(TestCase):
 
 
 class DetalheFormularioEstatisticaTests(TestCase):
+    def test_detalhe_formulario_exibe_link_para_respostas_por_usuario(self):
+        formulario = Formulario.objects.create(
+            titulo='Pesquisa de Satisfacao',
+            descricao='Detalhes do formulario',
+            status=Formulario.STATUS_ATIVO,
+        )
+
+        response = self.client.get(reverse('estatistica:detalhe_formulario', args=[formulario.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            reverse('estatistica:respostas_por_usuario', args=[formulario.id]),
+        )
+
     def test_detalhe_formulario_usa_percentual_css_com_ponto_nos_graficos(self):
         formulario = Formulario.objects.create(
             titulo='Pesquisa de Satisfacao',
@@ -183,3 +198,153 @@ class DetalheFormularioEstatisticaTests(TestCase):
             response.context['estatisticas_perguntas'][0]['stats']['distribuicao'][0]['texto'],
             opcao_ti.texto,
         )
+
+
+class RespostasPorUsuarioEstatisticaTests(TestCase):
+    def test_respostas_por_usuario_lista_usuarios_com_link_de_visualizacao(self):
+        curso = Curso.objects.create(nome='Sistemas de Informacao')
+        formulario = Formulario.objects.create(
+            titulo='Pesquisa de acompanhamento',
+            descricao='Formulario anual',
+            status=Formulario.STATUS_ATIVO,
+        )
+        pergunta_texto = Pergunta.objects.create(
+            formulario=formulario,
+            texto='Como avalia o curso?',
+            tipo=Pergunta.TIPO_TEXTO,
+            ordem=1,
+        )
+        pergunta_escala = Pergunta.objects.create(
+            formulario=formulario,
+            texto='De 1 a 5, qual sua satisfacao?',
+            tipo=Pergunta.TIPO_ESCALA,
+            ordem=2,
+        )
+
+        egresso_respondido = Egresso.objects.create(
+            nome_completo='Ana Silva',
+            email='ana@example.com',
+            whatsapp='11999999999',
+            curso=curso,
+            ano_conclusao=2023,
+            status=Egresso.STATUS_ATIVO,
+        )
+        egresso_pendente = Egresso.objects.create(
+            nome_completo='Bruno Souza',
+            email='bruno@example.com',
+            whatsapp='11888888888',
+            curso=curso,
+            ano_conclusao=2022,
+            status=Egresso.STATUS_ATIVO,
+        )
+
+        link_respondido = FormularioEgresso.objects.create(
+            formulario=formulario,
+            egresso=egresso_respondido,
+            utilizado=True,
+        )
+        FormularioEgresso.objects.create(
+            formulario=formulario,
+            egresso=egresso_pendente,
+            utilizado=False,
+        )
+
+        Resposta.objects.create(
+            formulario_egresso=link_respondido,
+            pergunta=pergunta_texto,
+            valor='Curso muito bom',
+            respondido_em=timezone.now(),
+        )
+        Resposta.objects.create(
+            formulario_egresso=link_respondido,
+            pergunta=pergunta_escala,
+            valor='5',
+            respondido_em=timezone.now(),
+        )
+
+        response = self.client.get(
+            reverse('estatistica:respostas_por_usuario', args=[formulario.id])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'estatistica/respostas_por_usuario.html')
+        self.assertEqual(response.context['total_usuarios'], 2)
+        self.assertEqual(response.context['total_respondidos'], 1)
+        self.assertEqual(response.context['total_pendentes'], 1)
+        self.assertEqual(response.context['links'][0].egresso.nome_completo, 'Ana Silva')
+        self.assertContains(response, 'Ana Silva')
+        self.assertContains(response, 'Bruno Souza')
+        self.assertContains(
+            response,
+            reverse(
+                'estatistica:visualizar_respostas_usuario',
+                args=[formulario.id, link_respondido.id],
+            ),
+        )
+
+    def test_visualizar_respostas_usuario_renderiza_formulario_em_modo_leitura(self):
+        curso = Curso.objects.create(nome='Sistemas de Informacao')
+        formulario = Formulario.objects.create(
+            titulo='Pesquisa de acompanhamento',
+            descricao='Formulario anual',
+            status=Formulario.STATUS_ATIVO,
+        )
+        pergunta_texto = Pergunta.objects.create(
+            formulario=formulario,
+            texto='Como avalia o curso?',
+            tipo=Pergunta.TIPO_TEXTO,
+            ordem=1,
+        )
+        pergunta_escolha = Pergunta.objects.create(
+            formulario=formulario,
+            texto='Qual area voce atua?',
+            tipo=Pergunta.TIPO_ESCOLHA,
+            ordem=2,
+        )
+        Opcao.objects.create(pergunta=pergunta_escolha, texto='TI')
+        Opcao.objects.create(pergunta=pergunta_escolha, texto='Educacao')
+
+        egresso = Egresso.objects.create(
+            nome_completo='Ana Silva',
+            email='ana@example.com',
+            whatsapp='11999999999',
+            curso=curso,
+            ano_conclusao=2023,
+            status=Egresso.STATUS_ATIVO,
+        )
+        link = FormularioEgresso.objects.create(
+            formulario=formulario,
+            egresso=egresso,
+            utilizado=True,
+        )
+
+        Resposta.objects.create(
+            formulario_egresso=link,
+            pergunta=pergunta_texto,
+            valor='Curso muito bom',
+            respondido_em=timezone.now(),
+        )
+        Resposta.objects.create(
+            formulario_egresso=link,
+            pergunta=pergunta_escolha,
+            valor='TI',
+            respondido_em=timezone.now(),
+        )
+
+        response = self.client.get(
+            reverse(
+                'estatistica:visualizar_respostas_usuario',
+                args=[formulario.id, link.id],
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'formularios/responder.html')
+        self.assertTrue(response.context['modo_visualizacao'])
+        self.assertEqual(response.context['egresso'].nome_completo, 'Ana Silva')
+        self.assertEqual(response.context['perguntas'][0].resposta_enviada, 'Curso muito bom')
+        self.assertEqual(response.context['perguntas'][1].resposta_enviada, 'TI')
+        self.assertContains(response, 'Somente leitura')
+        self.assertContains(response, 'Curso muito bom')
+        self.assertContains(response, 'readonly')
+        self.assertContains(response, 'disabled')

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ formulario.titulo }} | Acompanhamento de Egressos</title>
+  <title>{% if modo_visualizacao %}Respostas de {{ egresso.nome_completo }} | {% endif %}{{ formulario.titulo }} | Acompanhamento de Egressos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -84,6 +84,13 @@
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.14);
       backdrop-filter: blur(10px);
+    }
+
+    .topo .chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
     }
 
     .formulario-wrap {
@@ -338,6 +345,28 @@
       text-align: center;
     }
 
+    .modo-visualizacao .opcao-label,
+    .modo-visualizacao .escala-label {
+      cursor: default;
+    }
+
+    .modo-visualizacao .opcao-label:hover,
+    .modo-visualizacao .escala-label:hover {
+      transform: none;
+    }
+
+    .modo-visualizacao .textarea-resposta,
+    .modo-visualizacao .input-numerico {
+      background: #f8fafc;
+    }
+
+    .modo-visualizacao .textarea-resposta:focus,
+    .modo-visualizacao .input-numerico:focus {
+      transform: none;
+      border-color: #e2e8f0;
+      box-shadow: none;
+    }
+
     .obrig-asterisco {
       margin-left: 2px;
       color: #f43f5e;
@@ -368,9 +397,8 @@
     }
 
     @media (max-width: 480px) {
-      .topo .egresso-chip {
+      .topo .chips-wrap {
         width: 100%;
-        justify-content: center;
       }
 
       .progresso-wrap .label {
@@ -398,7 +426,7 @@
     }
   </style>
 </head>
-<body>
+<body class="{% if modo_visualizacao %}modo-visualizacao{% endif %}">
 
 <div class="topo">
   <i class="bi bi-mortarboard-fill icone"></i>
@@ -406,8 +434,23 @@
   {% if formulario.descricao %}
     <p class="descricao">{{ formulario.descricao }}</p>
   {% endif %}
-  <div class="egresso-chip">
-    <i class="bi bi-person-fill"></i> {{ egresso.nome_completo }}
+  <div class="chips-wrap">
+    <div class="egresso-chip">
+      <i class="bi bi-person-fill"></i> {{ egresso.nome_completo }}
+    </div>
+    {% if modo_visualizacao %}
+    <div class="egresso-chip">
+      <i class="bi bi-eye-fill"></i> Somente leitura
+    </div>
+    <div class="egresso-chip">
+      <i class="bi bi-clock-history"></i>
+      {% if respondido_em %}
+      Respondido em {{ respondido_em|date:"d/m/Y H:i" }}
+      {% else %}
+      Nenhuma resposta enviada
+      {% endif %}
+    </div>
+    {% endif %}
   </div>
 </div>
 
@@ -422,8 +465,10 @@
     </div>
   </div>
 
-  <form method="post" id="form-survey" novalidate>
+  <form {% if not modo_visualizacao %}method="post"{% endif %} id="form-survey" novalidate{% if modo_visualizacao %} onsubmit="return false;"{% endif %}>
+    {% if not modo_visualizacao %}
     {% csrf_token %}
+    {% endif %}
 
     {% if erro_formulario %}
     <div class="alert alert-danger border-0 shadow-sm mb-4">
@@ -451,6 +496,7 @@
                  class="opcao-radio resposta-input"
                  data-pergunta="{{ pergunta.pk }}"
                  {% if pergunta.resposta_enviada == op.texto %}checked{% endif %}
+                 {% if modo_visualizacao %}disabled{% endif %}
                  {% if pergunta.obrigatoria %}required{% endif %}>
           <label for="op_{{ op.pk }}" class="opcao-label">
             <span class="opcao-bolinha"></span>
@@ -472,6 +518,7 @@
                    class="escala-radio resposta-input"
                    data-pergunta="{{ pergunta.pk }}"
                    {% if pergunta.resposta_enviada == i %}checked{% endif %}
+                   {% if modo_visualizacao %}disabled{% endif %}
                    {% if pergunta.obrigatoria %}required{% endif %}>
             <label for="escala_{{ pergunta.pk }}_{{ i }}" class="escala-label">{{ i }}</label>
             {% endfor %}
@@ -488,6 +535,7 @@
                     data-pergunta="{{ pergunta.pk }}"
                     rows="3"
                     placeholder="Digite sua resposta..."
+                    {% if modo_visualizacao %}readonly{% endif %}
                     {% if pergunta.obrigatoria %}required{% endif %}>{{ pergunta.resposta_enviada }}</textarea>
         </div>
 
@@ -498,6 +546,7 @@
                  class="input-numerico resposta-input"
                  data-pergunta="{{ pergunta.pk }}"
                  value="{{ pergunta.resposta_enviada }}"
+                 {% if modo_visualizacao %}readonly{% endif %}
                  placeholder="Digite um número..."
                  {% if pergunta.obrigatoria %}required{% endif %}>
         </div>
@@ -511,12 +560,22 @@
     </div>
     {% endfor %}
 
+    {% if modo_visualizacao %}
+    <a href="{{ voltar_url }}" class="btn-enviar d-inline-flex align-items-center justify-content-center text-decoration-none">
+      <i class="bi bi-arrow-left me-2"></i>{{ voltar_label|default:"Voltar" }}
+    </a>
+    {% else %}
     <button type="submit" class="btn-enviar">
       <i class="bi bi-send-fill me-2"></i>Enviar Respostas
     </button>
+    {% endif %}
 
     <p class="rodape-nota">
+      {% if modo_visualizacao %}
+      <i class="bi bi-file-earmark-lock2 me-1"></i>Visualização de respostas em modo somente leitura.
+      {% else %}
       <i class="bi bi-shield-lock me-1"></i>Suas respostas são confidenciais e usadas apenas para fins acadêmicos.
+      {% endif %}
     </p>
   </form>
 </div>

@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.db.models import Count, Max, Q
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.egresso.models import Egresso
@@ -249,6 +250,87 @@ def detalhe_formulario(request, formulario_id):
         'estatisticas_perguntas': estatisticas_perguntas,
     }
     return render(request, 'estatistica/detalhe_formulario.html', context)
+
+
+def respostas_por_usuario(request, formulario_id):
+    formulario = get_object_or_404(Formulario, id=formulario_id)
+    query = request.GET.get('q', '').strip()
+    curso = request.GET.get('curso', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+
+    links = (
+        FormularioEgresso.objects.filter(formulario=formulario)
+        .select_related('egresso__curso')
+        .annotate(
+            total_respostas=Count('respostas'),
+            ultima_resposta_em=Max('respostas__respondido_em'),
+        )
+    )
+
+    if query:
+        links = links.filter(
+            Q(egresso__nome_completo__icontains=query) |
+            Q(egresso__email__icontains=query) |
+            Q(egresso__curso__nome__icontains=query)
+        )
+
+    if curso:
+        links = links.filter(egresso__curso__nome__icontains=curso)
+
+    if status_filter == 'respondido':
+        links = links.filter(total_respostas__gt=0)
+    elif status_filter == 'pendente':
+        links = links.filter(total_respostas=0)
+
+    links = list(links.order_by('egresso__nome_completo'))
+
+    total_usuarios = len(links)
+    total_respondidos = sum(1 for link in links if link.total_respostas > 0)
+    total_pendentes = total_usuarios - total_respondidos
+
+    context = {
+        'formulario': formulario,
+        'links': links,
+        'total_usuarios': total_usuarios,
+        'total_respondidos': total_respondidos,
+        'total_pendentes': total_pendentes,
+    }
+    return render(request, 'estatistica/respostas_por_usuario.html', context)
+
+
+def visualizar_respostas_usuario(request, formulario_id, link_id):
+    formulario = get_object_or_404(Formulario, id=formulario_id)
+    link = get_object_or_404(
+        FormularioEgresso.objects.select_related('egresso', 'egresso__curso', 'formulario'),
+        id=link_id,
+        formulario=formulario,
+    )
+    perguntas = formulario.perguntas.prefetch_related('opcoes').all()
+    respostas = list(link.respostas.select_related('pergunta').all())
+    respostas_por_pergunta = {
+        resposta.pergunta_id: resposta for resposta in respostas
+    }
+
+    for pergunta in perguntas:
+        pergunta.resposta_enviada = ''
+        pergunta.erro_resposta = ''
+
+        resposta = respostas_por_pergunta.get(pergunta.id)
+        if resposta:
+            pergunta.resposta_enviada = resposta.valor
+
+    respondido_em = max((resposta.respondido_em for resposta in respostas), default=None)
+
+    context = {
+        'formulario': formulario,
+        'perguntas': perguntas,
+        'egresso': link.egresso,
+        'modo_visualizacao': True,
+        'respondido_em': respondido_em,
+        'voltar_url': reverse('estatistica:respostas_por_usuario', args=[formulario.id]),
+        'voltar_label': 'Voltar para lista',
+    }
+    return render(request, 'formularios/responder.html', context)
 
 
 def listar_respostas_texto(request, formulario_id, pergunta_id):

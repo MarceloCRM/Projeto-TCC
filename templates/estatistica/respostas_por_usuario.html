@@ -1,0 +1,238 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Respostas por usuário | Acompanhamento de Egressos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .respostas-usuarios-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .respostas-usuarios-nome-col {
+        width: 28%;
+    }
+
+    .respostas-usuarios-curso-col {
+        width: 22%;
+    }
+
+    .respostas-usuarios-table th,
+    .respostas-usuarios-table td {
+        vertical-align: middle;
+    }
+
+    .respostas-usuarios-table .respostas-usuarios-nome-col,
+    .respostas-usuarios-table .respostas-usuarios-curso-col {
+        white-space: normal;
+        word-break: break-word;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4 border-bottom pb-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'estatistica:lista_formularios' %}" class="text-decoration-none">Estatísticas</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'estatistica:detalhe_formulario' formulario.id %}" class="text-decoration-none">{{ formulario.titulo|truncatechars:30 }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Respostas por usuário</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-1">Respostas por usuário</h2>
+            <p class="text-muted mb-0">Selecione um egresso para visualizar o formulário preenchido em modo somente leitura.</p>
+        </div>
+
+        <a href="{% url 'estatistica:detalhe_formulario' formulario.id %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar para estatísticas
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted d-block mb-1">Formulário</small>
+                    <div class="fw-semibold">{{ formulario.titulo }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted d-block mb-1">Usuários vinculados</small>
+                    <h3 class="fw-bold mb-0">{{ total_usuarios }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted d-block mb-1">Respondidos / pendentes</small>
+                    <h3 class="fw-bold mb-0">{{ total_respondidos }} <span class="text-muted fs-6 fw-normal">/ {{ total_pendentes }}</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-2 mb-2">
+                <div class="col-md-4">
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control"
+                        placeholder="Buscar por nome, e-mail ou curso..."
+                        value="{{ request.GET.q }}"
+                    >
+                </div>
+
+                <div class="col-md-3">
+                    <input
+                        type="text"
+                        name="curso"
+                        class="form-control"
+                        placeholder="Filtrar por curso..."
+                        value="{{ request.GET.curso }}"
+                    >
+                </div>
+
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">Todos os status</option>
+                        <option value="respondido" {% if request.GET.status == 'respondido' %}selected{% endif %}>Respondido</option>
+                        <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button class="btn btn-outline-primary w-100">
+                        Buscar
+                    </button>
+
+                    <a href="{% url 'estatistica:respostas_por_usuario' formulario.id %}" class="btn btn-secondary w-100">
+                        Limpar
+                    </a>
+                </div>
+            </form>
+
+            <div class="mb-2 text-muted" style="margin-left: 5px;">
+                Total: {{ total_usuarios }}
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 small respostas-usuarios-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th onclick="sortTable(0)" style="cursor: pointer;" class="ps-4 respostas-usuarios-nome-col">Nome <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                            <th onclick="sortTable(1)" style="cursor: pointer;" class="respostas-usuarios-curso-col">Curso <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                            <th onclick="sortTable(2)" style="cursor: pointer;" class="text-center">Status <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                            <th onclick="sortTable(3)" style="cursor: pointer;" class="text-center">Respondidas <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                            <th onclick="sortTable(4)" style="cursor: pointer;" class="text-center">Última resposta <i class="bi bi-arrow-down-up small text-muted"></i></th>
+                            <th class="text-center pe-4">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-respostas-usuarios">
+                        {% for link in links %}
+                        <tr>
+                            <td class="ps-4 respostas-usuarios-nome-col">
+                                <div class="fw-semibold">{{ link.egresso.nome_completo }}</div>
+                                <small class="text-muted">{{ link.egresso.email }}</small>
+                            </td>
+                            <td class="respostas-usuarios-curso-col">{{ link.egresso.curso }}</td>
+                            <td class="text-center">
+                                {% if link.total_respostas > 0 %}
+                                <span class="badge bg-success-subtle text-success-emphasis">Respondido</span>
+                                {% else %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis">Pendente</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">{{ link.total_respostas }}</td>
+                            <td class="text-center">
+                                {% if link.ultima_resposta_em %}
+                                {{ link.ultima_resposta_em|date:"d/m/Y H:i" }}
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'estatistica:visualizar_respostas_usuario' formulario.id link.id %}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-eye me-1"></i> Visualizar
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                Nenhum usuário vinculado a este formulário.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sortOrders = {};
+
+    function parseDate(dateStr) {
+        const parts = dateStr.split(/[\/\s:]/);
+        if (parts.length >= 5) {
+            return new Date(parts[2], parts[1] - 1, parts[0], parts[3], parts[4]);
+        }
+        return null;
+    }
+
+    function sortTable(n) {
+        const tableBody = document.getElementById("tabela-respostas-usuarios");
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+        if (rows.length === 1 && rows[0].cells.length === 1) return;
+
+        let dir = sortOrders[n] === "asc" ? "desc" : "asc";
+        sortOrders[n] = dir;
+
+        const sortedRows = rows.sort((a, b) => {
+            let x = a.cells[n].innerText.toLowerCase().trim();
+            let y = b.cells[n].innerText.toLowerCase().trim();
+
+            if (n === 4) {
+                let xDate = parseDate(x);
+                let yDate = parseDate(y);
+                if (xDate && yDate) {
+                    return dir === "asc" ? xDate - yDate : yDate - xDate;
+                }
+            }
+
+            let xNum = parseFloat(x.replace(/[^\d.-]/g, ''));
+            let yNum = parseFloat(y.replace(/[^\d.-]/g, ''));
+
+            if (!isNaN(xNum) && !isNaN(yNum) && n === 3) {
+                return dir === "asc" ? xNum - yNum : yNum - xNum;
+            }
+
+            return dir === "asc" ? x.localeCompare(y) : y.localeCompare(x);
+        });
+
+        tableBody.innerHTML = "";
+        sortedRows.forEach(row => tableBody.appendChild(row));
+
+        const icons = document.querySelectorAll('thead th i');
+        icons.forEach((icon, index) => {
+            if (index === n) {
+                icon.className = dir === 'asc' ? 'bi bi-caret-up-fill small text-primary' : 'bi bi-caret-down-fill small text-primary';
+            } else if (index < 5) {
+                icon.className = 'bi bi-arrow-down-up small text-muted';
+            }
+        });
+    }
+</script>
+{% endblock %}
