@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
+from apps.curso.models import Curso
 from apps.formularios.models import Formulario
 from apps.egresso.forms import EgressoFiltroForm
 from apps.egresso.models import Egresso
@@ -13,12 +14,15 @@ def enviar_formulario(request):
     formularios = Formulario.objects.filter(status=Formulario.STATUS_ATIVO)
     egressos = Egresso.objects.select_related('curso').filter(status=Egresso.STATUS_ATIVO)
     form_filtro = EgressoFiltroForm(request.GET)
+    cursos_disponiveis = Curso.objects.order_by('nome')
+    cursos_selecionados = [
+        curso_id for curso_id in request.GET.getlist('cursos') if curso_id.isdigit()
+    ]
     formulario_id_get = request.GET.get('formulario_id')
     canais_get = request.GET.getlist('canais')
 
     if form_filtro.is_valid():
         busca = form_filtro.cleaned_data.get('busca')
-        curso = form_filtro.cleaned_data.get('curso')
         ano = form_filtro.cleaned_data.get('ano_conclusao')
         status = form_filtro.cleaned_data.get('status')
 
@@ -29,8 +33,8 @@ def enviar_formulario(request):
                 Q(curso__nome__icontains=busca)
             )
 
-        if curso:
-            egressos = egressos.filter(curso__nome__icontains=curso)
+        if cursos_selecionados:
+            egressos = egressos.filter(curso_id__in=cursos_selecionados)
 
         if ano:
             egressos = egressos.filter(ano_conclusao=ano)
@@ -80,6 +84,8 @@ def enviar_formulario(request):
         'formularios': formularios,
         'egressos': egressos,
         'form_filtro': form_filtro,
+        'cursos_disponiveis': cursos_disponiveis,
+        'cursos_selecionados': cursos_selecionados,
         'formulario_id_get': formulario_id_get,
         'canais_get': canais_get,
     }

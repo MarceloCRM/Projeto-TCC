@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from apps.curso.models import Curso
 from apps.egresso.forms import EgressoFiltroForm, EgressoForm
 from apps.egresso.models import Egresso
 
@@ -8,10 +9,13 @@ from apps.egresso.models import Egresso
 def listar_egresso(request):
     egressos = Egresso.objects.select_related('curso').all().order_by('-criado_em')
     form_filtro = EgressoFiltroForm(request.GET)
+    cursos_disponiveis = Curso.objects.order_by('nome')
+    cursos_selecionados = [
+        curso_id for curso_id in request.GET.getlist('cursos') if curso_id.isdigit()
+    ]
 
     if form_filtro.is_valid():
         busca = form_filtro.cleaned_data.get('busca')
-        curso = form_filtro.cleaned_data.get('curso')
         ano = form_filtro.cleaned_data.get('ano_conclusao')
         status = form_filtro.cleaned_data.get('status')
 
@@ -22,8 +26,8 @@ def listar_egresso(request):
                 Q(curso__nome__icontains=busca)
             )
 
-        if curso:
-            egressos = egressos.filter(curso__nome__icontains=curso)
+        if cursos_selecionados:
+            egressos = egressos.filter(curso_id__in=cursos_selecionados)
 
         if ano:
             egressos = egressos.filter(ano_conclusao=ano)
@@ -34,6 +38,8 @@ def listar_egresso(request):
     context = {
         'egressos': egressos,
         'form_filtro': form_filtro,
+        'cursos_disponiveis': cursos_disponiveis,
+        'cursos_selecionados': cursos_selecionados,
         'total': egressos.count(),
     }
 

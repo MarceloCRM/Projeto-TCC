@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 
+from apps.curso.models import Curso
 from apps.egresso.models import Egresso
 from apps.formularios.models import Formulario, FormularioEgresso, Pergunta, Resposta
 
@@ -255,7 +256,9 @@ def detalhe_formulario(request, formulario_id):
 def respostas_por_usuario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     query = request.GET.get('q', '').strip()
-    curso = request.GET.get('curso', '').strip()
+    cursos_selecionados = [
+        curso_id for curso_id in request.GET.getlist('cursos') if curso_id.isdigit()
+    ]
     status_filter = request.GET.get('status', '').strip()
 
     links = (
@@ -274,8 +277,8 @@ def respostas_por_usuario(request, formulario_id):
             Q(egresso__curso__nome__icontains=query)
         )
 
-    if curso:
-        links = links.filter(egresso__curso__nome__icontains=curso)
+    if cursos_selecionados:
+        links = links.filter(egresso__curso_id__in=cursos_selecionados)
 
     if status_filter == 'respondido':
         links = links.filter(total_respostas__gt=0)
@@ -294,6 +297,8 @@ def respostas_por_usuario(request, formulario_id):
         'total_usuarios': total_usuarios,
         'total_respondidos': total_respondidos,
         'total_pendentes': total_pendentes,
+        'cursos_disponiveis': Curso.objects.order_by('nome'),
+        'cursos_selecionados': cursos_selecionados,
     }
     return render(request, 'estatistica/respostas_por_usuario.html', context)
 

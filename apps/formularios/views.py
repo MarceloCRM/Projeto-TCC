@@ -1,7 +1,6 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
 from .forms import FormularioFiltroForm, FormularioForm, PerguntaForm
 from .models import Formulario, FormularioEgresso, Opcao, Pergunta, Resposta
 
@@ -49,7 +48,7 @@ def _apply_answer_state(perguntas, respostas_enviadas, erros_pergunta):
 
 
 def listar_formularios(request):
-    formularios = Formulario.objects.all().order_by('-criado_em')
+    formularios = Formulario.objects.all()
     form_filtro = FormularioFiltroForm(request.GET)
 
     if form_filtro.is_valid():
@@ -68,6 +67,8 @@ def listar_formularios(request):
 
         if criado_em:
             formularios = formularios.filter(criado_em__date=criado_em)
+
+    formularios = formularios.order_by('-criado_em')
 
     return render(request, 'formularios/listar_formularios.html', {
         'formularios': formularios,

@@ -1,0 +1,32 @@
+<div class="border rounded-3 p-3 bg-light">
+    <div class="small fw-semibold text-uppercase text-muted mb-2">
+        Cursos
+    </div>
+
+    {% if cursos_disponiveis %}
+    <div class="row g-2">
+        {% for curso in cursos_disponiveis %}
+        <div class="col-md-6 col-lg-4">
+            <div class="form-check">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="cursos"
+                    value="{{ curso.id }}"
+                    id="{{ checkbox_prefix|default:'curso' }}_{{ curso.id }}"
+                    {% if form_id %}form="{{ form_id }}"{% endif %}
+                    {% if curso.id|stringformat:'s' in cursos_selecionados %}checked{% endif %}
+                >
+                <label class="form-check-label small" for="{{ checkbox_prefix|default:'curso' }}_{{ curso.id }}">
+                    {{ curso.nome }}
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-muted small">
+        Nenhum curso cadastrado.
+    </div>
+    {% endif %}
+</div>
