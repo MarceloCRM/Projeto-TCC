@@ -26,6 +26,55 @@
         white-space: normal;
         word-break: break-word;
     }
+
+    .filter-custom-select {
+        position: relative;
+    }
+
+    .filter-custom-toggle {
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        border: 1px solid rgb(223, 226, 230);
+    }
+
+    .filter-custom-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.9rem;
+        color: #212529;
+    }
+
+    .filter-custom-toggle:hover .filter-custom-label {
+        color: #fff;
+    }
+
+    .filter-custom-menu {
+        position: absolute;
+        top: calc(100% + 0.35rem);
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        display: none;
+        max-height: 260px;
+        overflow-y: auto;
+        padding: 0.85rem;
+        background: #fff;
+        border: 1px solid rgb(0, 110, 255);
+        border-radius: 0.75rem;
+        box-shadow: 0 0.75rem 1.5rem rgb(223, 226, 230);
+    }
+
+    .filter-custom-menu.show {
+        display: block;
+    }
+
+    .filter-custom-option + .filter-custom-option {
+        margin-top: 0.45rem;
+    }
 </style>
 {% endblock %}
 
@@ -38,19 +87,75 @@
 <div class="card shadow-sm">
     <div class="card-body">
         <form method="get" class="row g-2 mb-2">
-            <div class="col-md-5">
+            <div class="col-md-6">
                 {{ form_filtro.busca }}
             </div>
 
             <div class="col-md-3">
-                {{ form_filtro.criado_em }}
+                <div class="filter-custom-select" id="status-select">
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary w-100 filter-custom-toggle"
+                        id="status-select-toggle"
+                        aria-expanded="false"
+                    >
+                        <span class="filter-custom-label" id="status-select-label">
+                            {% if request.GET.status == 'ativo' %}
+                                Ativo
+                            {% elif request.GET.status == 'inativo' %}
+                                Inativo
+                            {% else %}
+                                Todos os Status
+                            {% endif %}
+                        </span>
+                        <i class="bi bi-chevron-down small"></i>
+                    </button>
+
+                    <div class="filter-custom-menu" id="status-select-menu">
+                        <div class="form-check filter-custom-option">
+                            <input
+                                class="form-check-input status-radio"
+                                type="radio"
+                                name="status"
+                                value=""
+                                id="status_todos"
+                                {% if not request.GET.status %}checked{% endif %}
+                            >
+                            <label class="form-check-label small" for="status_todos">
+                                Todos os Status
+                            </label>
+                        </div>
+                        <div class="form-check filter-custom-option">
+                            <input
+                                class="form-check-input status-radio"
+                                type="radio"
+                                name="status"
+                                value="ativo"
+                                id="status_ativo"
+                                {% if request.GET.status == 'ativo' %}checked{% endif %}
+                            >
+                            <label class="form-check-label small" for="status_ativo">
+                                Ativo
+                            </label>
+                        </div>
+                        <div class="form-check filter-custom-option">
+                            <input
+                                class="form-check-input status-radio"
+                                type="radio"
+                                name="status"
+                                value="inativo"
+                                id="status_inativo"
+                                {% if request.GET.status == 'inativo' %}checked{% endif %}
+                            >
+                            <label class="form-check-label small" for="status_inativo">
+                                Inativo
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-2">
-                {{ form_filtro.status }}
-            </div>
-
-            <div class="col-md-2 d-flex gap-2">
+            <div class="col-md-3 d-flex gap-2">
                 <button class="btn btn-outline-primary w-100">
                     Buscar
                 </button>
@@ -170,5 +275,36 @@
             }
         });
     }
+
+    // Lógica para Select de Status (Seleção Única)
+    const statusSelect = document.getElementById('status-select');
+    const statusSelectToggle = document.getElementById('status-select-toggle');
+    const statusSelectMenu = document.getElementById('status-select-menu');
+    const statusSelectLabel = document.getElementById('status-select-label');
+    const statusRadios = document.querySelectorAll('.status-radio');
+
+    statusSelectToggle.addEventListener('click', function () {
+        statusSelectMenu.classList.toggle('show');
+        statusSelectToggle.setAttribute(
+            'aria-expanded',
+            statusSelectMenu.classList.contains('show') ? 'true' : 'false'
+        );
+    });
+
+    statusRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const labelText = this.closest('.form-check').querySelector('label').textContent.trim();
+            statusSelectLabel.textContent = labelText;
+            statusSelectMenu.classList.remove('show');
+            statusSelectToggle.setAttribute('aria-expanded', 'false');
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (statusSelect && !statusSelect.contains(event.target)) {
+            statusSelectMenu.classList.remove('show');
+            statusSelectToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
 </script>
 {% endblock %}

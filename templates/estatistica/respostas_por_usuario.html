@@ -28,11 +28,11 @@
         word-break: break-word;
     }
 
-    .curso-multiselect {
+    .filter-custom-select {
         position: relative;
     }
 
-    .curso-multiselect-toggle {
+    .filter-custom-toggle {
         min-height: 38px;
         display: flex;
         align-items: center;
@@ -41,20 +41,19 @@
         border: 1px solid rgb(223, 226, 230);
     }
 
-    .curso-multiselect-label {
+    .filter-custom-label {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         font-size: 0.9rem;
-        color: rgb(91, 94, 97);
+        color: #212529;
     }
 
-    .curso-multiselect-toggle:hover .curso-multiselect-label {
+    .filter-custom-toggle:hover .filter-custom-label {
         color: #fff;
     }
 
-
-    .curso-multiselect-menu {
+    .filter-custom-menu {
         position: absolute;
         top: calc(100% + 0.35rem);
         left: 0;
@@ -70,11 +69,11 @@
         box-shadow: 0 0.75rem 1.5rem rgb(223, 226, 230);
     }
 
-    .curso-multiselect-menu.show {
+    .filter-custom-menu.show {
         display: block;
     }
 
-    .curso-multiselect-option + .curso-multiselect-option {
+    .filter-custom-option + .filter-custom-option {
         margin-top: 0.45rem;
     }
 </style>
@@ -141,14 +140,14 @@
                 </div>
 
                 <div class="col-md-3">
-                    <div class="curso-multiselect" id="curso-multiselect">
+                    <div class="filter-custom-select" id="curso-multiselect">
                         <button
                             type="button"
-                            class="btn btn-outline-secondary w-100 curso-multiselect-toggle"
+                            class="btn btn-outline-secondary w-100 filter-custom-toggle"
                             id="curso-multiselect-toggle"
                             aria-expanded="false"
                         >
-                            <span class="curso-multiselect-label" id="curso-multiselect-label">
+                            <span class="filter-custom-label" id="curso-multiselect-label">
                                 {% if cursos_selecionados %}
                                     {{ cursos_selecionados|length }} curso(s) selecionado(s)
                                 {% else %}
@@ -158,9 +157,9 @@
                             <i class="bi bi-chevron-down small"></i>
                         </button>
 
-                        <div class="curso-multiselect-menu" id="curso-multiselect-menu">
+                        <div class="filter-custom-menu" id="curso-multiselect-menu">
                             {% for curso in cursos_disponiveis %}
-                            <div class="form-check curso-multiselect-option">
+                            <div class="form-check filter-custom-option">
                                 <input
                                     class="form-check-input curso-checkbox"
                                     type="checkbox"
@@ -183,11 +182,67 @@
                 </div>
 
                 <div class="col-md-3">
-                    <select name="status" class="form-select">
-                        <option value="">Todos os status</option>
-                        <option value="respondido" {% if request.GET.status == 'respondido' %}selected{% endif %}>Respondido</option>
-                        <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
-                    </select>
+                    <div class="filter-custom-select" id="status-select">
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary w-100 filter-custom-toggle"
+                            id="status-select-toggle"
+                            aria-expanded="false"
+                        >
+                            <span class="filter-custom-label" id="status-select-label">
+                                {% if request.GET.status == 'respondido' %}
+                                    Respondido
+                                {% elif request.GET.status == 'pendente' %}
+                                    Pendente
+                                {% else %}
+                                    Todos os status
+                                {% endif %}
+                            </span>
+                            <i class="bi bi-chevron-down small"></i>
+                        </button>
+
+                        <div class="filter-custom-menu" id="status-select-menu">
+                            <div class="form-check filter-custom-option">
+                                <input
+                                    class="form-check-input status-radio"
+                                    type="radio"
+                                    name="status"
+                                    value=""
+                                    id="status_todos"
+                                    {% if not request.GET.status %}checked{% endif %}
+                                >
+                                <label class="form-check-label small" for="status_todos">
+                                    Todos os status
+                                </label>
+                            </div>
+                            <div class="form-check filter-custom-option">
+                                <input
+                                    class="form-check-input status-radio"
+                                    type="radio"
+                                    name="status"
+                                    value="respondido"
+                                    id="status_respondido"
+                                    {% if request.GET.status == 'respondido' %}checked{% endif %}
+                                >
+                                <label class="form-check-label small" for="status_respondido">
+                                    Respondido
+                                </label>
+                            </div>
+                            <div class="form-check filter-custom-option">
+                                <input
+                                    class="form-check-input status-radio"
+                                    type="radio"
+                                    name="status"
+                                    value="pendente"
+                                    id="status_pendente"
+                                    {% if request.GET.status == 'pendente' %}checked{% endif %}
+                                >
+                                <label class="form-check-label small" for="status_pendente">
+                                    Pendente
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-2 d-flex gap-2">
@@ -265,6 +320,7 @@
 <script>
     let sortOrders = {};
 
+    // Lógica Cursos (Multiselect)
     const cursoMultiselect = document.getElementById('curso-multiselect');
     const cursoMultiselectToggle = document.getElementById('curso-multiselect-toggle');
     const cursoMultiselectMenu = document.getElementById('curso-multiselect-menu');
@@ -288,26 +344,59 @@
         cursoMultiselectLabel.textContent = `${checked.length} curso(s) selecionado(s)`;
     }
 
-    cursoMultiselectToggle.addEventListener('click', function () {
-        cursoMultiselectMenu.classList.toggle('show');
-        cursoMultiselectToggle.setAttribute(
-            'aria-expanded',
-            cursoMultiselectMenu.classList.contains('show') ? 'true' : 'false'
-        );
-    });
-
-    document.addEventListener('click', function (event) {
-        if (!cursoMultiselect.contains(event.target)) {
-            cursoMultiselectMenu.classList.remove('show');
-            cursoMultiselectToggle.setAttribute('aria-expanded', 'false');
-        }
-    });
+    if (cursoMultiselectToggle) {
+        cursoMultiselectToggle.addEventListener('click', function () {
+            cursoMultiselectMenu.classList.toggle('show');
+            cursoMultiselectToggle.setAttribute(
+                'aria-expanded',
+                cursoMultiselectMenu.classList.contains('show') ? 'true' : 'false'
+            );
+        });
+    }
 
     cursoCheckboxes.forEach(cb => {
         cb.addEventListener('change', updateCursoMultiselectLabel);
     });
 
     updateCursoMultiselectLabel();
+
+    // Lógica Status (Radio)
+    const statusSelect = document.getElementById('status-select');
+    const statusSelectToggle = document.getElementById('status-select-toggle');
+    const statusSelectMenu = document.getElementById('status-select-menu');
+    const statusSelectLabel = document.getElementById('status-select-label');
+    const statusRadios = document.querySelectorAll('.status-radio');
+
+    if (statusSelectToggle) {
+        statusSelectToggle.addEventListener('click', function () {
+            statusSelectMenu.classList.toggle('show');
+            statusSelectToggle.setAttribute(
+                'aria-expanded',
+                statusSelectMenu.classList.contains('show') ? 'true' : 'false'
+            );
+        });
+    }
+
+    statusRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const labelText = this.closest('.form-check').querySelector('label').textContent.trim();
+            statusSelectLabel.textContent = labelText;
+            statusSelectMenu.classList.remove('show');
+            statusSelectToggle.setAttribute('aria-expanded', 'false');
+        });
+    });
+
+    // Fechar dropdowns ao clicar fora
+    document.addEventListener('click', function (event) {
+        if (cursoMultiselect && !cursoMultiselect.contains(event.target)) {
+            cursoMultiselectMenu.classList.remove('show');
+            cursoMultiselectToggle.setAttribute('aria-expanded', 'false');
+        }
+        if (statusSelect && !statusSelect.contains(event.target)) {
+            statusSelectMenu.classList.remove('show');
+            statusSelectToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
 
     function parseDate(dateStr) {
         const parts = dateStr.split(/[\/\s:]/);
