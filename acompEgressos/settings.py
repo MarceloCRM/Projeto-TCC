@@ -158,3 +158,7 @@ TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_WHATSAPP_FROM = os.environ.get('TWILIO_WHATSAPP_FROM')
 SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000')
+
+# Configuração SendGrid (E-mail) — preencher no .env
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')

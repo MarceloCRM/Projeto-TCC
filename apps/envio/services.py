@@ -56,6 +56,48 @@ def enviar_formulario_whatsapp(egresso, link_formulario):
         return False, str(e)
 
 
+def send_email_survey(egresso, link_formulario, form):
+    try:
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import Mail
+
+        if not settings.SENDGRID_API_KEY or not settings.DEFAULT_FROM_EMAIL:
+            logger.error('SendGrid credentials are not configured')
+            return False, 'Credenciais do SendGrid nao configuradas'
+
+        formulario_url = pegar_url_formulario(link_formulario.token)
+
+        message = Mail(
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to_emails=egresso.email,
+            subject=f'Sua participação é importante: {form.titulo}',
+            html_content=(
+                f'<p>Olá, <strong>{egresso.nome_completo}</strong>! Tudo bem?</p>'
+                f'<p>A sua instituição gostaria de ouvir você. '
+                f'Preparamos um formulário rápido para acompanhar a trajetoria dos nossos egressos, '
+                f'e sua participação é muito importante.</p>'
+                f'<p>Para responder, basta acessar o link abaixo:</p>'
+                f'<p><a href="{formulario_url}">{formulario_url}</a></p>'
+                f'<p>Leva só alguns minutos.</p>'
+                f'<p>Agradecemos muito pela sua colaboração!</p>'
+            )
+        )
+
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(message)
+
+        logger.info(f'Email sent to {egresso.email}: Status {response.status_code}')
+        return True, 'Success'
+
+    except ImportError:
+        logger.error('sendgrid package not installed')
+        return False, 'SendGrid not installed'
+
+    except Exception as e:
+        logger.error(f'Email error for {egresso.email}: {e}')
+        return False, str(e)
+
+
 def enviar_formulario_egresso(form, egresso_list, channels):
     """
     Send a survey to a list of egresso via selected channels.
@@ -84,13 +126,13 @@ def enviar_formulario_egresso(form, egresso_list, channels):
                     f'WhatsApp to {egresso.nome_completo}: {msg}'
                 )
 
-        # if 'email' in channels and egresso.email:
-        #     success, msg = send_email_survey(egresso, link_formulario, form)
-        #     if success:
-        #         results['email_sent'] += 1
-        #     else:
-        #         results['errors'].append(
-        #             f"Email to {egresso.nome_completo}: {msg}"
-        #         )
+        if 'email' in channels and egresso.email:
+            success, msg = send_email_survey(egresso, link_formulario, form)
+            if success:
+                results['email_sent'] += 1
+            else:
+                results['errors'].append(
+                    f"Email to {egresso.nome_completo}: {msg}"
+                )
 
     return results
