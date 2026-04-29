@@ -77,6 +77,18 @@ def listar_formularios(request):
     })
 
 
+def detalhe_formulario(request, formulario_id):
+    formulario = get_object_or_404(Formulario, id=formulario_id)
+    perguntas = formulario.perguntas.all()
+    total_perguntas = perguntas.count()
+
+    return render(request, 'formularios/detalhe_formulario.html', {
+        'formulario': formulario,
+        'perguntas': perguntas,
+        'total_perguntas': total_perguntas,
+    })
+
+
 def criar_formulario(request):
     if request.method == 'POST':
         form = FormularioForm(request.POST)

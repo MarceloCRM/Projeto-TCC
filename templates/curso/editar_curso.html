@@ -26,12 +26,12 @@
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 h-100">
             <div class="card-header py-3 px-4 fw-bold">
                 Dados do curso
             </div>
-            <div class="card-body p-4">
-                <form method="post">
+            <div class="card-body p-4 d-flex flex-column">
+                <form method="post" class="d-flex flex-column flex-grow-1">
                     {% csrf_token %}
 
                     {% if form.non_field_errors %}
@@ -56,7 +56,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 mt-auto">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle me-1"></i> Salvar
                         </button>
@@ -74,7 +74,7 @@
             <div class="card-header py-3 px-4 fw-bold">
                 Resumo
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 d-flex flex-column">
                 <div class="mb-4">
                     <small class="text-muted d-block mb-1">Curso atual</small>
                     <div class="fw-semibold">{{ curso.nome }}</div>
@@ -85,7 +85,7 @@
                     <div class="fw-semibold">{{ total_egressos }}</div>
                 </div>
 
-                <div class="bg-light rounded p-3 small text-muted">
+                <div class="bg-light rounded p-3 small text-muted mt-auto">
                     Alterar o nome do curso atualiza automaticamente a exibição nos módulos que usam esse relacionamento.
                 </div>
             </div>

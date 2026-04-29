@@ -176,6 +176,9 @@
                                 <td>{{ formulario.criado_em|date:"d/m/Y H:i" }}</td>
                                 <td>
                                     <div class="d-flex justify-content-center gap-2">
+                                        <a href="{% url 'formularios:detalhe_formulario' formulario.id %}" class="btn btn-sm btn-outline-info" title="Detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a href="{% url 'formularios:editar_formulario' formulario_id=formulario.id %}"
                                            class="btn btn-sm btn-outline-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>

@@ -37,6 +37,39 @@
         word-break: break-word;
     }
 
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+        padding-left: 2rem;
+        border-left: 2px solid #e9ecef;
+    }
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+        border-left: 2px solid transparent;
+    }
+
+    .timeline-icon {
+        position: absolute;
+        left: -9px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #0d6efd;
+    }
+    
+    .timeline-icon.bg-success {
+        border-color: #198754;
+        background-color: #198754 !important;
+    }
+
+    .timeline-icon.bg-warning {
+        border-color: #ffc107;
+        background-color: #ffc107 !important;
+    }
+
 </style>
 {% endblock %}
 
@@ -63,6 +96,7 @@
 </div>
 
 <div class="row g-4">
+    <!-- Hero (Counteúdo Superior) -->
     <div class="col-12">
         <div class="card shadow-sm border-0 egresso-hero">
             <div class="card-body p-4">
@@ -92,63 +126,153 @@
         </div>
     </div>
 
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white py-3 px-4 fw-bold">
-                Informações principais
+    <!-- Estatísticas de Engajamento -->
+    <div class="col-12">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-3">
+                        <small class="text-muted d-block mb-1">Formulários recebidos</small>
+                        <h3 class="fw-bold mb-0">{{ total_formularios }}</h3>
+                    </div>
+                </div>
             </div>
-
-            <div class="card-body p-4">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <span class="info-label">Nome completo</span>
-                        <div class="info-value">{{ egresso.nome_completo }}</div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-3">
+                        <small class="text-muted d-block mb-1">Respondidos</small>
+                        <h3 class="fw-bold text-success mb-0">{{ respondidos }}</h3>
                     </div>
-
-                    <div class="col-md-6">
-                        <span class="info-label">E-mail</span>
-                        <div class="info-value">{{ egresso.email }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-3">
+                        <small class="text-muted d-block mb-1">Pendentes</small>
+                        <h3 class="fw-bold text-warning mb-0">{{ pendentes }}</h3>
                     </div>
-
-                    <div class="col-md-6">
-                        <span class="info-label">Número de WhatsApp</span>
-                        <div class="info-value">{{ egresso.whatsapp|default:"-" }}</div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <span class="info-label">Curso</span>
-                        <div class="info-value">{{ egresso.curso }}</div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <span class="info-label">Ano de conclusão</span>
-                        <div class="info-value">{{ egresso.ano_conclusao }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-3">
+                        <small class="text-muted d-block mb-1">Taxa de resposta</small>
+                        <h3 class="fw-bold text-primary mb-0">{{ taxa_resposta }}%</h3>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-lg-4">
+    <!-- Informações Principais -->
+    <div class="col-lg-5">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 px-4 fw-bold">
+                        Informações de contato
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <span class="info-label">E-mail</span>
+                            <div class="info-value">{{ egresso.email }}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="info-label">Número de WhatsApp</span>
+                            <div class="info-value">{{ egresso.whatsapp|default:"-" }}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="info-label">Ano de conclusão</span>
+                            <div class="info-value">{{ egresso.ano_conclusao }}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <span class="info-label">Criado em</span>
+                            <div class="info-value">{{ egresso.criado_em|date:"d/m/Y H:i" }}</div>
+                        </div>
+
+                        <div>
+                            <span class="info-label">Última atualização</span>
+                            <div class="info-value">{{ egresso.atualizado_em|date:"d/m/Y H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trilha de Questionários -->
+    <div class="col-lg-7">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white py-3 px-4 fw-bold">
-                Dados do cadastro
+            <div class="card-header bg-white py-3 px-4 fw-bold d-flex justify-content-between align-items-center">
+                Trilha de questionários
+                <span class="badge bg-primary rounded-pill">{{ total_formularios }}</span>
             </div>
 
-            <div class="card-body p-4">
-                <div class="mb-4">
-                    <span class="info-label">Criado em</span>
-                    <div class="info-value">{{ egresso.criado_em|date:"d/m/Y H:i" }}</div>
-                </div>
-
-                <div class="mb-4">
-                    <span class="info-label">Última atualização</span>
-                    <div class="info-value">{{ egresso.atualizado_em|date:"d/m/Y H:i" }}</div>
-                </div>
-
-                <div class="rounded bg-light p-3 small text-muted">
-                    Este painel mostra apenas os dados atualmente mantidos no cadastro do egresso.
-                </div>
+            <div class="card-body p-0">
+                {% if links %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Formulário</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Data</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for link in links %}
+                                    <tr>
+                                        <td class="ps-4 fw-semibold">{{ link.formulario.titulo }}</td>
+                                        <td class="text-center">
+                                            {% if link.utilizado %}
+                                                <span class="badge bg-success-subtle text-success-emphasis border">Respondido</span>
+                                            {% else %}
+                                                <span class="badge bg-warning-subtle text-warning-emphasis border">Pendente</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if link.utilizado %}
+                                                {% with primeira_resposta=link.respostas.first %}
+                                                    {% if primeira_resposta %}
+                                                        {{ primeira_resposta.respondido_em|date:"d/m/Y H:i" }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% else %}
+                                                {{ link.criado_em|date:"d/m/Y" }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                {% if link.utilizado %}
+                                                <a href="{% url 'estatistica:visualizar_respostas_usuario' link.formulario.id link.id %}" class="btn btn-sm btn-outline-primary" title="Ver respostas">
+                                                    <i class="bi bi-eye"></i> Ver
+                                                </a>
+                                                {% else %}
+                                                <span class="text-muted small">-</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-5 text-center text-muted">
+                        <div class="mb-3">
+                            <i class="bi bi-ui-radios fs-1 text-muted opacity-50"></i>
+                        </div>
+                        <h6 class="text-muted">Nenhum formulário enviado</h6>
+                        <p class="small mb-0">Este egresso ainda não recebeu nenhum formulário para responder.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

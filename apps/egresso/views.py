@@ -80,8 +80,28 @@ def editar_egresso(request, pk):
 def detalhe_egresso(request, pk):
     egresso = get_object_or_404(Egresso.objects.select_related('curso'), pk=pk)
 
+    # Buscar links de formulários do egresso
+    links = egresso.links.select_related('formulario').prefetch_related('respostas').order_by('-criado_em')
+
+    total_formularios = links.count()
+    respondidos = links.filter(utilizado=True).count()
+    pendentes = total_formularios - respondidos
+    
+    taxa_resposta = 0
+    if total_formularios > 0:
+        taxa_resposta = int((respondidos / total_formularios) * 100)
+
+    context = {
+        'egresso': egresso,
+        'links': links,
+        'total_formularios': total_formularios,
+        'respondidos': respondidos,
+        'pendentes': pendentes,
+        'taxa_resposta': taxa_resposta,
+    }
+
     return render(
         request,
         template_name='egresso/detalhe_egresso.html',
-        context={'egresso': egresso},
+        context=context,
     )

@@ -32,8 +32,8 @@ class Pergunta(models.Model):
 
     TIPOS = [
         (TIPO_TEXTO, 'Texto'),
-        (TIPO_NUMERO, 'Numero'),
-        (TIPO_ESCOLHA, 'Multipla escolha'),
+        (TIPO_NUMERO, 'Número'),
+        (TIPO_ESCOLHA, 'Múltipla escolha'),
         (TIPO_ESCALA, 'Escala de 1 a 5'),
     ]
 
