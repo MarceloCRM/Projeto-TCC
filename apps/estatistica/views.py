@@ -6,6 +6,8 @@ from django.db.models import Count, Max, Q
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from apps.core.decorators import role_admin_required
 
 from apps.curso.models import Curso
 from apps.egresso.models import Egresso
@@ -22,6 +24,7 @@ def _formatar_percentual_css(valor):
     return f'{valor:.1f}'.rstrip('0').rstrip('.')
 
 
+@login_required
 def index(request):
     hoje = timezone.localdate()
     inicio_periodo = hoje - timedelta(days=29)
@@ -119,6 +122,7 @@ def index(request):
     return render(request, 'estatistica/index.html', context)
 
 
+@login_required
 def lista_formularios(request):
     query = request.GET.get('q')
     status_filter = request.GET.get('status')
@@ -146,6 +150,8 @@ def lista_formularios(request):
     }
     return render(request, 'estatistica/lista_formularios.html', context)
 
+
+@login_required
 def detalhe_formulario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     
@@ -253,6 +259,7 @@ def detalhe_formulario(request, formulario_id):
     return render(request, 'estatistica/detalhe_formulario.html', context)
 
 
+@role_admin_required
 def respostas_por_usuario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     query = request.GET.get('q', '').strip()
@@ -303,6 +310,7 @@ def respostas_por_usuario(request, formulario_id):
     return render(request, 'estatistica/respostas_por_usuario.html', context)
 
 
+@role_admin_required
 def visualizar_respostas_usuario(request, formulario_id, link_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     link = get_object_or_404(
@@ -338,6 +346,7 @@ def visualizar_respostas_usuario(request, formulario_id, link_id):
     return render(request, 'formularios/responder.html', context)
 
 
+@login_required
 def listar_respostas_texto(request, formulario_id, pergunta_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     pergunta = get_object_or_404(

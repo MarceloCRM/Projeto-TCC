@@ -1,7 +1,9 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
+from apps.core.decorators import role_admin_required
 from apps.curso.models import Curso
 from apps.formularios.models import Formulario
 from apps.egresso.forms import EgressoFiltroForm
@@ -9,7 +11,7 @@ from apps.egresso.models import Egresso
 
 from .services import enviar_formulario_egresso
 
-
+@role_admin_required
 def enviar_formulario(request):
     formularios = Formulario.objects.filter(status=Formulario.STATUS_ATIVO)
     egressos = Egresso.objects.select_related('curso').filter(status=Egresso.STATUS_ATIVO)

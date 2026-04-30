@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load core_tags %}
 
 {% block title %}Cursos | Acompanhamento de Egressos{% endblock %}
 
@@ -81,7 +82,9 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
     <h3>Cursos</h3>
+    {% if request.user|has_role:'Admin' %}
     <a href="{% url 'curso:criar_curso' %}" class="btn btn-primary">Novo Curso</a>
+    {% endif %}
 </div>
 
 <div class="card shadow-sm">
@@ -201,9 +204,11 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
 
+                                        {% if request.user|has_role:'Admin' %}
                                         <a href="{% url 'curso:editar_curso' curso.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>

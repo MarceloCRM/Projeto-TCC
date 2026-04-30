@@ -1,4 +1,4 @@
-{% load static %}
+{% load static core_tags %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -132,17 +132,38 @@
                     <i class="bi bi-file-earmark-text"></i> Formulários
                 </a>
             </li>
+            {% if request.user|has_role:'Admin' %}
             <li class="nav-item">
                 <a href="{% url 'envio:enviar_formulario' %}" class="nav-link {% if request.resolver_match.url_name == 'enviar_formulario' %}active{% endif %}">
                     <i class="bi bi-file-earmark-text"></i> Envio de formulários
                 </a>
             </li>
+            {% endif %}
             <li class="nav-item">
                 <a href="{% url 'estatistica:lista_formularios' %}" class="nav-link {% if request.resolver_match.app_name == 'estatistica' and request.resolver_match.url_name != 'index' %}active{% endif %}">
                     <i class="bi bi-graph-up"></i> Estatísticas
                 </a>
             </li>
         </ul>
+
+        <div class="sidebar-footer mt-auto">
+            {% if request.user.is_authenticated %}
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="avatar">{{ request.user.username.0|upper }}</div>
+                        <div>
+                            <div style="line-height: 1.2; font-size: 0.9rem;">{{ request.user.username }}</div>
+                        </div>
+                    </div>
+                    <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link logout p-0 border-0" title="Sair">
+                            <i class="bi bi-box-arrow-right fs-5"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
     </aside>
 
     <main class="flex-fill p-4 content-area">

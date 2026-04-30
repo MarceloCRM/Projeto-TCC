@@ -1,6 +1,9 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
+from apps.core.decorators import role_admin_required
 from .forms import FormularioFiltroForm, FormularioForm, PerguntaForm
 from .models import Formulario, FormularioEgresso, Opcao, Pergunta, Resposta
 
@@ -46,7 +49,7 @@ def _apply_answer_state(perguntas, respostas_enviadas, erros_pergunta):
         pergunta.resposta_enviada = respostas_enviadas.get(pergunta.pk, '')
         pergunta.erro_resposta = erros_pergunta.get(pergunta.pk, '')
 
-
+@login_required
 def listar_formularios(request):
     formularios = Formulario.objects.all()
     form_filtro = FormularioFiltroForm(request.GET)
@@ -76,7 +79,7 @@ def listar_formularios(request):
         'total': formularios.count(),
     })
 
-
+@login_required
 def detalhe_formulario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
     perguntas = formulario.perguntas.all()
@@ -88,7 +91,7 @@ def detalhe_formulario(request, formulario_id):
         'total_perguntas': total_perguntas,
     })
 
-
+@role_admin_required
 def criar_formulario(request):
     if request.method == 'POST':
         form = FormularioForm(request.POST)
@@ -100,7 +103,7 @@ def criar_formulario(request):
 
     return render(request, 'formularios/criar_formulario.html', {'form': form})
 
-
+@role_admin_required
 def editar_formulario(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
 
@@ -149,7 +152,7 @@ def editar_formulario(request, formulario_id):
         'perguntas': perguntas,
     })
 
-
+@role_admin_required
 def criar_pergunta(request, formulario_id):
     formulario = get_object_or_404(Formulario, id=formulario_id)
 
@@ -183,7 +186,7 @@ def criar_pergunta(request, formulario_id):
         'formulario': formulario,
     })
 
-
+@role_admin_required
 def editar_pergunta(request, pergunta_id):
     pergunta = get_object_or_404(Pergunta, id=pergunta_id)
     formulario = pergunta.formulario

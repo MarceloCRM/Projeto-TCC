@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load static core_tags %}
 
 {% block title %}Estatísticas: {{ formulario.titulo }} | Acompanhamento de Egressos{% endblock %}
 
@@ -194,9 +195,11 @@
         </div>
         <div class="col-md-4">
             <div class="d-flex justify-content-md-end">
+                {% if request.user|has_role:'Admin' %}
                 <a href="{% url 'estatistica:respostas_por_usuario' formulario.id %}" class="btn btn-outline-primary">
                     <i class="bi bi-people me-1"></i> Ver respostas por usuário
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -1,10 +1,12 @@
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
 
+from apps.core.decorators import role_admin_required
 from apps.curso.forms import CursoFiltroForm, CursoForm
 from apps.curso.models import Curso
 
-
+@login_required
 def listar_curso(request):
     cursos = Curso.objects.annotate(total_egressos=Count('egressos', distinct=True)).order_by('-criado_em')
     form_filtro = CursoFiltroForm(request.GET)
@@ -31,7 +33,7 @@ def listar_curso(request):
 
     return render(request, 'curso/listar_curso.html', context)
 
-
+@role_admin_required
 def criar_curso(request):
     if request.method == 'POST':
         form = CursoForm(request.POST)
@@ -43,7 +45,7 @@ def criar_curso(request):
 
     return render(request, 'curso/criar_curso.html', {'form': form})
 
-
+@role_admin_required
 def editar_curso(request, pk):
     curso = get_object_or_404(Curso, pk=pk)
 
@@ -63,7 +65,7 @@ def editar_curso(request, pk):
 
     return render(request, 'curso/editar_curso.html', context)
 
-
+@login_required
 def detalhe_curso(request, pk):
     curso = get_object_or_404(
         Curso.objects.annotate(total_egressos=Count('egressos', distinct=True)),

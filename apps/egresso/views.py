@@ -1,11 +1,13 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
 
+from apps.core.decorators import role_admin_required
 from apps.curso.models import Curso
 from apps.egresso.forms import EgressoFiltroForm, EgressoForm
 from apps.egresso.models import Egresso
 
-
+@login_required
 def listar_egresso(request):
     egressos = Egresso.objects.select_related('curso').all().order_by('-criado_em')
     form_filtro = EgressoFiltroForm(request.GET)
@@ -45,7 +47,7 @@ def listar_egresso(request):
 
     return render(request, 'egresso/listar_egresso.html', context)
 
-
+@role_admin_required
 def criar_egresso(request):
     if request.method == 'POST':
         form = EgressoForm(request.POST)
@@ -57,7 +59,7 @@ def criar_egresso(request):
 
     return render(request, template_name='egresso/criar_egresso.html', context={'form': form})
 
-
+@role_admin_required
 def editar_egresso(request, pk):
     egresso = get_object_or_404(Egresso.objects.select_related('curso'), pk=pk)
 
@@ -76,7 +78,7 @@ def editar_egresso(request, pk):
 
     return render(request, template_name='egresso/editar_egresso.html', context=context)
 
-
+@login_required
 def detalhe_egresso(request, pk):
     egresso = get_object_or_404(Egresso.objects.select_related('curso'), pk=pk)
 

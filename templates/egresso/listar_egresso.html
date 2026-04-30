@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load core_tags %}
 
 {% block title %}Egressos | Acompanhamento de Egressos{% endblock %}
 
@@ -82,7 +83,9 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
     <h3>Egressos</h3>
+    {% if request.user|has_role:'Admin' %}
     <a href="{% url 'egresso:criar_egresso' %}" class="btn btn-primary">Novo Egresso</a>
+    {% endif %}
 </div>
 
 <div class="card shadow-sm">
@@ -249,9 +252,11 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
 
+                                        {% if request.user|has_role:'Admin' %}
                                         <a href="{% url 'egresso:editar_egresso' eg.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>

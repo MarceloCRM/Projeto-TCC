@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load core_tags %}
 
 {% block title %}Formulários | Acompanhamento de Egressos{% endblock %}
 
@@ -58,9 +59,11 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
     <h3>Formulários</h3>
+    {% if request.user|has_role:'Admin' %}
     <a href="{% url 'formularios:criar_formulario' %}" class="btn btn-primary">
         <i class="bi bi-plus-circle"></i> Criar novo formulário
     </a>
+    {% endif %}
 </div>
 
 <div class="card shadow-sm">
@@ -179,10 +182,12 @@
                                         <a href="{% url 'formularios:detalhe_formulario' formulario.id %}" class="btn btn-sm btn-outline-info" title="Detalhes">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                        {% if request.user|has_role:'Admin' %}
                                         <a href="{% url 'formularios:editar_formulario' formulario_id=formulario.id %}"
                                            class="btn btn-sm btn-outline-secondary" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
