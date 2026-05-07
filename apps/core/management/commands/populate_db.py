@@ -10,7 +10,7 @@ from apps.formularios.models import Formulario, FormularioEgresso, Opcao, Pergun
 
 
 class Command(BaseCommand):
-    help = 'Popula o banco de dados com dados realistas para testes e estatisticas.'
+    help = 'Popula o banco de dados com dados realistas para testes e estatísticas.'
 
     def handle(self, *args, **options):
         self.stdout.write('Limpando o banco de dados atual...')
@@ -24,18 +24,18 @@ class Command(BaseCommand):
 
         self.stdout.write('Criando Egressos...')
         cursos = [
-            Curso.objects.create(nome='Engenharia de Computacao'),
-            Curso.objects.create(nome='Ciencia da Computacao'),
-            Curso.objects.create(nome='Sistemas de Informacao'),
-            Curso.objects.create(nome='Analise e Desenvolvimento de Sistemas'),
+            Curso.objects.create(nome='Engenharia de Computação'),
+            Curso.objects.create(nome='Ciência da Computação'),
+            Curso.objects.create(nome='Sistemas de Informação'),
+            Curso.objects.create(nome='Análise e Desenvolvimento de Sistemas'),
         ]
-        empresas = ['Google', 'Meta', 'Amazon', 'Nubank', 'Itau', 'Inter', 'Localiza', 'Totvs', 'Freelancer', 'Nenhuma']
+        empresas = ['Google', 'Meta', 'Amazon', 'Nubank', 'Itaú', 'Inter', 'Localiza', 'Totvs', 'Freelancer', 'Nenhuma']
         nomes = [
             'Ana Silva', 'Bruno Oliveira', 'Carla Santos', 'Diego Souza', 'Eduarda Lima',
-            'Fabio Pereira', 'Gabriela Costa', 'Henrique Rocha', 'Isabela Martins', 'Joao Ferreira',
-            'Katia Gomes', 'Lucas Almeida', 'Mariana Ribeiro', 'Natan Lopes', 'Olivia Mendes',
-            'Paulo Borges', 'Quenia Cavalcanti', 'Rafael Teixeira', 'Sara Cardoso', 'Tiago Machado',
-            'Ursula Farias', 'Vitor Hugo', 'Wagner Jesus', 'Xuxa Meneghel', 'Yago Ramos', 'Zilda Arns'
+            'Fábio Pereira', 'Gabriela Costa', 'Henrique Rocha', 'Isabela Martins', 'João Ferreira',
+            'Kátia Gomes', 'Lucas Almeida', 'Mariana Ribeiro', 'Natan Lopes', 'Olívia Mendes',
+            'Paulo Borges', 'Quênia Cavalcanti', 'Rafael Teixeira', 'Sara Cardoso', 'Tiago Machado',
+            'Úrsula Farias', 'Vítor Hugo', 'Wagner Jesus', 'Xuxa Meneghel', 'Yago Ramos', 'Zilda Arns'
         ]
 
         egressos = []
@@ -52,65 +52,66 @@ class Command(BaseCommand):
 
         self.stdout.write(f'{len(egressos)} egressos criados.')
 
-        self.stdout.write('Criando Formularios e Perguntas...')
+        self.stdout.write('Criando Formulários e Perguntas...')
 
         f1 = Formulario.objects.create(
-            titulo='Pesquisa de Satisfacao de Ex-Alunos',
-            descricao='Queremos saber sua opiniao sobre o curso e sua trajetoria profissional.',
+            titulo='Pesquisa de Satisfação de Ex-Alunos',
+            descricao='Queremos saber sua opinião sobre o curso e sua trajetória profissional.',
             status=Formulario.STATUS_ATIVO,
         )
 
         p1_1 = Pergunta.objects.create(
             formulario=f1,
-            texto='Como voce avalia a qualidade do ensino do seu curso?',
+            texto='Como você avalia a qualidade do ensino do seu curso?',
             tipo=Pergunta.TIPO_ESCALA,
             ordem=1,
         )
         p1_2 = Pergunta.objects.create(
             formulario=f1,
-            texto='Qual sua principal area de atuacao hoje?',
+            texto='Você está empregado atualmente? Se sim, qual sua principal área de atuação hoje?',
             tipo=Pergunta.TIPO_ESCOLHA,
             ordem=2,
         )
         Opcao.objects.create(pergunta=p1_2, texto='Desenvolvimento Web')
         Opcao.objects.create(pergunta=p1_2, texto='Data Science')
         Opcao.objects.create(pergunta=p1_2, texto='Infraestrutura/Cloud')
-        Opcao.objects.create(pergunta=p1_2, texto='Gestao de Projetos')
+        Opcao.objects.create(pergunta=p1_2, texto='Gestão de Projetos')
         Opcao.objects.create(pergunta=p1_2, texto='Outro')
+        Opcao.objects.create(pergunta=p1_2, texto='Atualmente não estou empregado')
 
         Pergunta.objects.create(
             formulario=f1,
-            texto='Quanto tempo voce levou para conseguir o primeiro emprego na area (em meses)?',
+            texto='Quanto tempo você levou para conseguir o primeiro emprego na área (em meses)?',
             tipo=Pergunta.TIPO_NUMERO,
             ordem=3,
         )
         Pergunta.objects.create(
             formulario=f1,
-            texto='Deixe um comentario sobre como o curso ajudou na sua carreira.',
+            texto='Deixe um comentário sobre como o curso ajudou na sua carreira.',
             tipo=Pergunta.TIPO_TEXTO,
             ordem=4,
         )
 
         f2 = Formulario.objects.create(
             titulo='Acompanhamento Profissional 2026',
-            descricao='Atualizacao anual de dados dos egressos.',
+            descricao='Atualização anual de dados dos egressos.',
             status=Formulario.STATUS_ATIVO,
         )
 
         p2_1 = Pergunta.objects.create(
             formulario=f2,
-            texto='Voce utiliza as tecnologias aprendidas no curso no seu dia a dia?',
+            texto='Você utiliza as tecnologias aprendidas no curso no seu dia a dia?',
             tipo=Pergunta.TIPO_ESCOLHA,
             ordem=1,
         )
         Opcao.objects.create(pergunta=p2_1, texto='Sim, diariamente')
         Opcao.objects.create(pergunta=p2_1, texto='Sim, ocasionalmente')
         Opcao.objects.create(pergunta=p2_1, texto='Raramente')
-        Opcao.objects.create(pergunta=p2_1, texto='Nao utilizo')
+        Opcao.objects.create(pergunta=p2_1, texto='Não utilizo')
 
         Pergunta.objects.create(
             formulario=f2,
-            texto='Qual seu nivel de satisfacao com seu cargo atual?',
+            texto='Qual seu nível de satisfação com seu cargo atual?',
             tipo=Pergunta.TIPO_ESCALA,
             ordem=2,
         )
@@ -142,9 +143,9 @@ class Command(BaseCommand):
                         else:
                             valor = random.choice([
                                 'O curso foi excelente!',
-                                'Poderia ter mais aulas praticas.',
-                                'Os professores sao muito bons.',
-                                'Aprendi muito sobre logica.',
+                                'Poderia ter mais aulas práticas.',
+                                'Os professores são muito bons.',
+                                'Aprendi muito sobre lógica.',
                                 'Gostaria de ter visto mais tecnologias modernas.',
                             ])
                     elif pergunta.tipo == Pergunta.TIPO_NUMERO:
