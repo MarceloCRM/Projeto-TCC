@@ -303,13 +303,24 @@
                         <div class="row align-items-center scale-stats">
                             <div class="col-md-3 text-center border-end">
                                 <h1 class="display-3 fw-bold text-primary mb-0">{{ item.stats.media }}</h1>
-                                <div class="text-warning fs-5">
-                                    {% with ""|center:5 as range %}
-                                    {% for _ in range %}
-                                        <i class="bi {% if forloop.counter <= item.stats.media %}bi-star-fill{% elif forloop.counter|add:"-0.5" <= item.stats.media %}bi-star-half{% else %}bi-star{% endif %}"></i>
-                                    {% endfor %}
-                                    {% endwith %}
+                                <div class="stars-container position-relative d-inline-block fs-5" data-rating="{{ item.stats.media }}" style="line-height: 1;">
+                                    <div class="stars-bg" style="color: #e4e5e9; white-space: nowrap;">
+                                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                    </div>
+                                    <div class="stars-fg text-warning position-absolute top-0 start-0 overflow-hidden" style="white-space: nowrap; width: 0%;">
+                                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                    </div>
                                 </div>
+                                <script>
+                                    (function() {
+                                        var container = document.currentScript.previousElementSibling;
+                                        var ratingStr = container.getAttribute('data-rating');
+                                        var rating = parseFloat(ratingStr.replace(',', '.'));
+                                        if (!isNaN(rating)) {
+                                            container.querySelector('.stars-fg').style.width = (rating / 5 * 100) + '%';
+                                        }
+                                    })();
+                                </script>
                                 <p class="text-muted small mt-1">Média de avaliação</p>
                             </div>
                             <div class="col-md-4 ps-md-3">
