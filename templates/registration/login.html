@@ -3,68 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - Acompanhamento de Egressos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap 5 CSS (Padrão do projeto) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <style>
         body {
-            background-color: #f5f6fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            font-family: 'Inter', "Segoe UI", Roboto, sans-serif;
+            background-color: #112239; /* Cor de fallback/mobile */
             margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        .login-card {
-            background: white;
-            padding: 2.5rem 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
+
+        .split-layout {
+            min-height: 100vh;
         }
-        .login-card .brand {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
+
+        /* Lado esquerdo escuro */
+        .left-pane {
+            background-color: #112239;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
             text-align: center;
-            color: #0b1220;
+            position: relative;
+        }
+
+        .brand-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        /* Lado direito claro (Formulário) */
+        .right-pane {
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem;
+            border-top-left-radius: 40px;
+            border-bottom-left-radius: 40px;
+            box-shadow: -15px 0 40px rgba(0,0,0,0.1);
+        }
+
+        .auth-container {
+            max-width: 420px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Componentes de formulário personalizados */
+        .custom-input {
+            padding: 0.8rem 1.2rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            color: #112239;
+        }
+
+        .custom-input:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 0.25rem rgba(17, 34, 57, 0.05);
+            background-color: #ffffff;
+        }
+
+        .input-group .custom-input:first-child {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .input-group .btn-outline-secondary {
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            color: #94a3b8;
+            border-top-right-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .input-group .custom-input:focus + .btn-outline-secondary {
+            border-color: #94a3b8;
+            background-color: #ffffff;
+        }
+
+        .btn-primary-custom {
+            background-color: #112239;
+            border-color: #112239;
+            padding: 0.85rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #0f172a;
+            border-color: #0f172a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(17, 34, 57, 0.15);
+        }
+
+        /* Ajustes responsivos */
+        @media (max-width: 767.98px) {
+            .left-pane {
+                display: none !important;
+            }
+            .right-pane {
+                border-radius: 0;
+                min-height: 100vh;
+                box-shadow: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="brand">
-            Acompanhamento de Egressos
-        </div>
-        
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                Usuário ou senha inválidos. Por favor, tente novamente.
-            </div>
-        {% endif %}
-
-        {% if next %}
-            {% if user.is_authenticated %}
-                <div class="alert alert-warning">
-                    Sua conta não tem acesso a esta página. Para prosseguir,
-                    faça login com uma conta que tenha acesso.
+    <div class="container-fluid p-0">
+        <div class="row g-0 split-layout">
+            
+            <!-- Painel Esquerdo Institucional (Visível apenas md+) -->
+            <div class="col-md-5 col-lg-6 left-pane d-none d-md-flex">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                    <h1 class="brand-title">Acompanhamento<br>de Egressos</h1>
+                    <p class="text-white-50 fs-5 mb-0" style="max-width: 400px;">
+                        Sistema para acompanhamento de egressos e gestão de dados institucionais.
+                    </p>
                 </div>
-            {% endif %}
-        {% endif %}
-        
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="id_username" class="form-label">Usuário</label>
-                <input type="text" name="username" class="form-control" id="id_username" required autofocus>
+                
+                <div class="position-absolute bottom-0 pb-4 text-center w-100">
+                    <small class="text-white-50 fw-medium">&copy; {% now "Y" %} Instituição. Todos os direitos reservados.</small>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="id_password" class="form-label">Senha</label>
-                <input type="password" name="password" class="form-control" id="id_password" required>
+
+            <!-- Painel Direito - Formulário -->
+            <div class="col-md-7 col-lg-6 right-pane">
+                <div class="auth-container">
+                    
+                    <!-- Cabeçalho visível apenas no mobile -->
+                    <div class="d-md-none mb-5 text-center">
+                        <h2 class="fw-bold" style="color: #112239; font-size: 1.75rem; letter-spacing: -0.5px;">
+                            Acompanhamento de Egressos
+                        </h2>
+                    </div>
+                    
+                    <!-- Boas-vindas -->
+                    <div class="mb-4 text-center text-md-start">
+                        <h3 class="fw-bold mb-2" style="color: #112239; font-size: 2rem; letter-spacing: -0.5px;">Entrar na sua conta</h3>
+                        <p class="text-muted" style="font-size: 0.95rem;">Informe seu usuário e senha para continuar.</p>
+                    </div>
+
+                    <!-- Mensagens de Erro do Django -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4">
+                            <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                            <div>Usuário ou senha inválidos. Por favor, tente novamente.</div>
+                        </div>
+                    {% endif %}
+
+                    {% if next %}
+                        {% if user.is_authenticated %}
+                            <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center mb-4">
+                                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                                <div>Sua conta não tem acesso a esta página. Para prosseguir, faça login com uma conta que tenha acesso.</div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- Formulário de Login -->
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label fw-semibold" style="color: #334155; font-size: 0.85rem;">Usuário</label>
+                            <input type="text" name="username" class="form-control custom-input" id="id_username" placeholder="Digite seu usuário" required autofocus>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label for="id_password" class="form-label fw-semibold mb-2" style="color: #334155; font-size: 0.85rem;">Senha</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="password" name="password" class="form-control custom-input border-end-0" id="id_password" placeholder="• • • • • • • •" required>
+                                <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword" tabindex="-1">
+                                    <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="next" value="{{ next }}">
+                        <button type="submit" class="btn btn-primary-custom w-100 text-white mt-2">
+                            Entrar
+                        </button>
+                    </form>
+
+                </div>
             </div>
             
-            <input type="hidden" name="next" value="{{ next }}">
-            <button type="submit" class="btn btn-primary w-100 mt-2">Entrar</button>
-        </form>
+        </div>
     </div>
+
+    <!-- Script de manipulação visual -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar/Ocultar Senha
+            const togglePassword = document.querySelector("#togglePassword");
+            const password = document.querySelector("#id_password");
+            const toggleIcon = document.querySelector("#toggleIcon");
+
+            if (togglePassword) {
+                togglePassword.addEventListener("click", function () {
+                    const type = password.getAttribute("type") === "password" ? "text" : "password";
+                    password.setAttribute("type", type);
+                    
+                    if (type === "password") {
+                        toggleIcon.classList.remove("bi-eye");
+                        toggleIcon.classList.add("bi-eye-slash");
+                    } else {
+                        toggleIcon.classList.remove("bi-eye-slash");
+                        toggleIcon.classList.add("bi-eye");
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
